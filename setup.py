@@ -23,7 +23,7 @@ setup(
     license="LICENSE.txt",
     description="Tools for loading and analyzing large text corpora.",
 
-    long_description=open("README.txt").read(),
+    long_description=open("README.md").read(),
 
     classifiers=[
         # How mature is this project?
@@ -45,8 +45,7 @@ setup(
         'Tracker': 'https://github.com/maltevogl/corpussearch/issues',
     },
 
-    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.1.tar.gz'
-
+    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.1.tar.gz',
 
     python_requires='>=3',
 
