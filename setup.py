@@ -5,7 +5,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.2",
+    version="0.0.3",
 
     # Application author details:
     author="Malte Vogl",
@@ -18,7 +18,6 @@ setup(
     include_package_data=True,
 
     # Details
-    url="http://pypi.python.org/pypi/corpussearch/",
 
     license="LICENSE.txt",
     description="Tools for loading and analyzing large text corpora.",
@@ -39,9 +38,9 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     project_urls={
-        'Source': 'https://github.com/TOPOI-DH/corpussearch/',
+        'Home': 'https://github.com/TOPOI-DH/corpussearch/',
         'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.2.tar.gz',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.3.tar.gz',
     },
 
     python_requires='>=3',
