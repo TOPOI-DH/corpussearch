@@ -19,7 +19,7 @@ setup(
 
     # Details
 
-    license="LICENSE.txt",
+    license="GPLv3",
     description="Tools for loading and analyzing large text corpora.",
 
     long_description=open("README.md").read(),
