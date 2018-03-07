@@ -9,7 +9,7 @@ Making a New Release
     # ...
     version='0.0.2',
     # ...
-    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.2.tar.gz',
+    download_url='https://github.com/TOPOI-DH/corpussearch/archive/0.0.2.tar.gz',
     )
 ```
 

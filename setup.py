@@ -5,7 +5,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.1",
+    version="0.0.2",
 
     # Application author details:
     author="Malte Vogl",
@@ -39,11 +39,10 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     project_urls={
-        'Source': 'https://github.com/maltevogl/corpussearch/',
-        'Tracker': 'https://github.com/maltevogl/corpussearch/issues',
+        'Source': 'https://github.com/TOPOI-DH/corpussearch/',
+        'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.2.tar.gz',
     },
-
-    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.1.tar.gz',
 
     python_requires='>=3',
 

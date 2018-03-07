@@ -3,7 +3,7 @@ import re
 import difflib
 
 
-class CorpusTextSearch():
+class CorpusTextSearch(object):
     """
     This class is initialized with a searchstring, the name of the column,
     which contains the textstrings, and a path to a pickled dataframe.
