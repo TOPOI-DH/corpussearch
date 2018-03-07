@@ -30,13 +30,11 @@ setup(
         'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
-        'Intended Audience :: Researchers',
-        'Topic :: Analysis :: Text',
-        'Topic :: Analysis :: Corpora',
-
+        'Intended Audience :: Science/Research',
+        'Topic :: Text Processing :: General',
+        'Topic :: Text Processing :: Indexing',
         # Pick your license as you wish
-         'License :: CC4',
-
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         # Specify the Python versions you support here.
         'Programming Language :: Python :: 3',
     ],
