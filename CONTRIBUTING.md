@@ -7,9 +7,9 @@ Making a New Release
 ```python
  setup(
     # ...
-    version='0.1.21',
+    version='0.0.2',
     # ...
-    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.1.tar.gz',
+    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.2.tar.gz',
     )
 ```
 
