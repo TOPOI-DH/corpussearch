@@ -44,6 +44,8 @@ class CorpusTextSearch(object):
         self.dataindex = dataIndex
 
         self.levelValues = {}
+        
+        self.column = colname
 
         if searchstring:
             self.Kstr = searchstring
@@ -74,32 +76,40 @@ class CorpusTextSearch(object):
             Result is in self.result, to be able to chain reductions.
             To view result use self.results()
         """
-        if self.dataindex == 'multi':
-            if level in ['part', 'volume']:
-                if level not in self.levelValues.keys():
+    
+        if level in ['part', 'volume']:
+            if level not in self.levelValues.keys():
+                if self.dataindex == 'multi':
                     self.levelValues[level] = self.dataframe.index.get_level_values(level).unique()
+                elif self.dataindex == 'single':
+                    self.levelValues[level] = self.dataframe[level].unique()
                 else:
-                    pass
-                if value not in self.levelValues[level]:
-                    closestMatch = difflib.get_close_matches(value, self.levelValues[level],1)
-                    if closestMatch:
-                        searchValue = closestMatch[0]
-                    else:
-                        raise ValueError(
-                            'Could not find matching expression to search.'
-                            )
-                else:
-                    searchValue = value
-                if type(self.result) == str:
-                    self.result = self.dataframe.xs(searchValue, level=level)
-                else:
-                    self.result = self.result.xs(searchValue, level=level)
+                    raise ValueError(
+                        'DataIndex not "single" or "multi".'
+                        )        
             else:
-                if type(self.result) == str:
-                    self.result = self.dataframe.xs(value, level=level)
+                pass
+            
+            if value not in self.levelValues[level]:
+                closestMatch = difflib.get_close_matches(value, self.levelValues[level],1)
+                if closestMatch:
+                    searchValue = closestMatch[0]
                 else:
-                    self.result = self.dataframe.xs(value, level=level)
-            return self
+                    raise ValueError(
+                        'Could not find matching expression to search.'
+                        )
+            else:
+                searchValue = value
+            if type(self.result) == str:
+                self.result = self.dataframe.xs(searchValue, level=level)
+            else:
+                self.result = self.result.xs(searchValue, level=level)
+        else:
+            if type(self.result) == str:
+                self.result = self.dataframe.xs(value, level=level)
+            else:
+                self.result = self.result.xs(value, level=level)  
+        return self
 
     def results(self):
         """Returns the search result as a single-index dataframe."""
