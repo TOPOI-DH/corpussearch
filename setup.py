@@ -41,11 +41,11 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     project_urls={
-        'Documentation':
-            'https://packaging.python.org/tutorials/distributing-packages/',
         'Source': 'https://github.com/maltevogl/corpussearch/',
         'Tracker': 'https://github.com/maltevogl/corpussearch/issues',
     },
+
+    download_url='https://github.com/maltevogl/corpussearch/archive/0.0.1.tar.gz'
 
 
     python_requires='>=3',
