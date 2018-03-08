@@ -12,7 +12,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.3",
+    version="0.0.4",
 
     # Application author details:
     author="Malte Vogl",
@@ -49,7 +49,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/TOPOI-DH/corpussearch/',
         'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.3.tar.gz',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.4.tar.gz',
     },
 
     python_requires='>=3',
