@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 import re
 import difflib
@@ -44,7 +45,7 @@ class CorpusTextSearch(object):
         self.dataindex = dataIndex
 
         self.levelValues = {}
-        
+
         self.column = colname
 
         if searchstring:
@@ -76,7 +77,7 @@ class CorpusTextSearch(object):
             Result is in self.result, to be able to chain reductions.
             To view result use self.results()
         """
-    
+
         if level in ['part', 'volume']:
             if level not in self.levelValues.keys():
                 if self.dataindex == 'multi':
@@ -86,12 +87,12 @@ class CorpusTextSearch(object):
                 else:
                     raise ValueError(
                         'DataIndex not "single" or "multi".'
-                        )        
+                        )
             else:
                 pass
-            
+
             if value not in self.levelValues[level]:
-                closestMatch = difflib.get_close_matches(value, self.levelValues[level],1)
+                closestMatch = difflib.get_close_matches(value, self.levelValues[level], 1)
                 if closestMatch:
                     searchValue = closestMatch[0]
                 else:
@@ -100,22 +101,56 @@ class CorpusTextSearch(object):
                         )
             else:
                 searchValue = value
-            if type(self.result) == str:
-                self.result = self.dataframe.xs(searchValue, level=level)
-            else:
-                self.result = self.result.xs(searchValue, level=level)
+            self._searchString(level, searchValue)
         else:
-            if type(self.result) == str:
-                self.result = self.dataframe.xs(value, level=level)
-            else:
-                self.result = self.result.xs(value, level=level)  
+            self._searchString(level, value)
         return self
+
+    def _searchString(self, level, value):
+        """Helper function for reducing dataframes"""
+        if self.dataindex == 'multi':
+            if type(self.result) == str:
+                self.result = self.dataframe.xs(self._assertDataType(level, value, self.dataframe), level=level, drop_level=False)
+            else:
+                self.result = self.result.xs(self._assertDataType(level, value, self.result), level=level, drop_level=False)
+        elif self.dataindex == 'single':
+            if type(self.result) == str:
+                self.result = self.dataframe[self.dataframe[level] == self._assertDataType(level, value, self.dataframe)]
+            else:
+                self.result = self.result[self.result[level] == self._assertDataType(level, value, self.result)]
+
+    def _assertDataType(self, level, value, dataframe):
+        """Helper function to assert correct datatype for value at level"""
+        intTypes = ['int8', 'int16', 'int32', 'int64', 'float']
+        valueType = type(value)
+        if self.dataindex == 'multi':
+            levelType = dataframe.index.get_level_values(level=level).dtype.name
+        elif self.dataindex == 'single':
+            levelType = self.dataframe[level].dtype.name
+        if levelType == 'object' and valueType == str:
+            return value
+        elif levelType == 'object' and valueType == int:
+            try:
+                return str(value)
+            except ValueError as err:
+                raise('Can not cast {0} to type {1}'.format(value, levelType))
+        elif levelType in intTypes and valueType == int:
+            return value
+        elif levelType in intTypes and valueType == str:
+            try:
+                return int(value)
+            except ValueError:
+                raise('Can not cast {0} to type {1}'.format(value, levelType))
+        else:
+            raise ValueError('Can not cast {0} to type {1}'.format(value, levelType))
 
     def results(self):
         """Returns the search result as a single-index dataframe."""
         if self.dataindex == 'multi':
             self.indexLevels = list(self.result.index.names)
             formatedResult = self.result.reset_index(level=self.indexLevels)
+        elif self.dataindex == 'single':
+            formatedResult = self.result
         pd.set_option('display.max_colwidth', -1)
         return formatedResult
 

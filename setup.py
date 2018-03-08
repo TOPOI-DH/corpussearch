@@ -1,4 +1,11 @@
+# -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
+
+with open('README.md') as f:
+    readme = f.read()
+
+with open('LICENSE.md') as f:
+    license = f.read()
 
 setup(
     # Application name:
@@ -12,17 +19,19 @@ setup(
     author_email="mvogl@mpiwg-berlin.mpg.de",
 
     # Packages
-    packages=["corpussearch"],
+    packages=find_packages(exclude=('tests')),
 
     # Include additional files into the package
     include_package_data=True,
 
+    url='https://github.com/TOPOI-DH/corpussearch/',
+
     # Details
 
-    license="GPLv3",
+    license=license,
     description="Tools for loading and analyzing large text corpora.",
 
-    long_description=open("README.md").read(),
+    long_description=readme,
 
     classifiers=[
         # How mature is this project?
@@ -49,4 +58,6 @@ setup(
     install_requires=[
         "pandas",
     ],
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )
