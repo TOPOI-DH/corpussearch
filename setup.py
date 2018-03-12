@@ -50,6 +50,7 @@ setup(
     # Dependent packages (distributions)
     install_requires=[
         "pandas",
+        "citableclass"
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

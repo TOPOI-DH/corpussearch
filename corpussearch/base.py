@@ -2,6 +2,7 @@
 import pandas as pd
 import re
 import difflib
+from citableclass.base import Citable
 
 
 class CorpusTextSearch(object):
@@ -22,40 +23,51 @@ class CorpusTextSearch(object):
     def __init__(
             self, pathDF,
             dataType='pickle', dataIndex='multi', colname='text',
-            searchstring=False, pathMeta=False
+            maxValues=2500, pathMeta=False, pathType=False
             ):
 
         self.datatype = dataType
 
-        if self.datatype == 'pickle':
-            self.dataframe = pd.read_pickle(pathDF)
-        elif self.datatype == 'excel':
-            self.dataframe = pd.read_excel(pathDF)
-        elif self.datatype == 'csv':
-            self.dataframe = pd.read_csv(pathDF)
-        elif self.datatype == 'json':
-            self.dataframe = pd.read_json(pathDF)
-        else:
-            raise ValueError(
-                'Please provide data in pickle,excel,csv or json format'
-                )
+        if pathType == 'DOI':
+            pathDF = "http://dx.doi.org/{0}".format(pathDF)
+        elif pathType == 'citable':
+            self.citable = Citable(pathDF)
+            self.dataframe = self.citable.digitalresource()
 
-        self.extData = ''
+        if not pathType == 'citable':
+            if self.datatype == 'pickle':
+                self.dataframe = pd.read_pickle(pathDF)
+            elif self.datatype == 'excel':
+                self.dataframe = pd.read_excel(pathDF)
+            elif self.datatype == 'csv':
+                self.dataframe = pd.read_csv(pathDF, error_bad_lines=False)
+            elif self.datatype == 'json':
+                self.dataframe = pd.read_json(pathDF)
+            else:
+                raise ValueError(
+                    'Please provide data in pickle,excel,csv or json format'
+                    )
 
         self.dataindex = dataIndex
+
+        self.colValueDictTrigger = []
+        if self.dataindex == 'single':
+            for col in self.dataframe.columns:
+                if not self.dataframe[col].dtype.name in ['int','int64','float64']:
+                    if len(self.dataframe[col].unique()) < maxValues:
+                        self.colValueDictTrigger.append(col)
+        elif self.dataindex == 'multi':
+            for level in self.dataframe.index.names:
+                if not self.dataframe.index.get_level_values(level).dtype.name in ['int','int64','float64']:
+                    if len(self.dataframe.index.get_level_values(level).unique()) < maxValues:
+                        self.colValueDictTrigger.append(level)
+
+        self.extData = ''
+        self.result = ''
 
         self.levelValues = {}
 
         self.column = colname
-
-        if searchstring:
-            self.Kstr = searchstring
-            self.result = self.dataframe[
-                            self.dataframe[self.column].str.contains(self.Kstr)
-                            ]
-        else:
-            self.Kstr = ''
-            self.result = ''
 
         if pathMeta:
             self.metaData = pd.read_excel(pathMeta)
@@ -66,6 +78,21 @@ class CorpusTextSearch(object):
         """ Reset pandas display option for max_colwidth"""
         pd.reset_option('display.max_colwidth')
         return
+
+    def resetSearch(self):
+        """Reset self.result to full dataframe."""
+        self.result = ''
+        return
+
+    def search(self, value):
+        """
+        Search string in colname column.
+        """
+        if type(self.result) == str:
+            self.result = self.dataframe[self.dataframe[self.column].str.contains(value)]
+        elif isinstance(self.result, pd.DataFrame):
+            self.result = self.result[self.result[self.column].str.contains(value)]
+        return self
 
     def reduce(self, level, value):
         """ Return reduced dataframe for search tuple (level/column,value):
@@ -78,7 +105,7 @@ class CorpusTextSearch(object):
             To view result use self.results()
         """
 
-        if level in ['part', 'volume']:
+        if level in self.colValueDictTrigger:
             if level not in self.levelValues.keys():
                 if self.dataindex == 'multi':
                     self.levelValues[level] = self.dataframe.index.get_level_values(level).unique()
@@ -92,13 +119,16 @@ class CorpusTextSearch(object):
                 pass
 
             if value not in self.levelValues[level]:
-                closestMatch = difflib.get_close_matches(value, self.levelValues[level], 1)
-                if closestMatch:
-                    searchValue = closestMatch[0]
-                else:
-                    raise ValueError(
-                        'Could not find matching expression to search.'
-                        )
+                try:
+                    closestMatch = difflib.get_close_matches(value, self.levelValues[level], 1)
+                    if closestMatch:
+                        searchValue = closestMatch[0]
+                    else:
+                        raise ValueError(
+                            'Could not find matching expression to search.'
+                            )
+                except TypeError:
+                    searchValue = value
             else:
                 searchValue = value
             self._searchString(level, searchValue)
@@ -121,7 +151,7 @@ class CorpusTextSearch(object):
 
     def _assertDataType(self, level, value, dataframe):
         """Helper function to assert correct datatype for value at level"""
-        intTypes = ['int8', 'int16', 'int32', 'int64', 'float']
+        intTypes = ['int8', 'int16', 'int32', 'int64', 'float','float64']
         valueType = type(value)
         if self.dataindex == 'multi':
             levelType = dataframe.index.get_level_values(level=level).dtype.name
@@ -135,6 +165,8 @@ class CorpusTextSearch(object):
             except ValueError as err:
                 raise('Can not cast {0} to type {1}'.format(value, levelType))
         elif levelType in intTypes and valueType == int:
+            return value
+        elif levelType in intTypes and valueType == float:
             return value
         elif levelType in intTypes and valueType == str:
             try:
@@ -160,6 +192,9 @@ class CorpusTextSearch(object):
         metadata on the desired level. The metadata is calculated for all other
         levels of multi-indexed dataframe.
         """
+        if not self.dataindex == 'multi':
+            print('Statistics for multiindexed dataframes only.')
+            return
         self.extData = pd.merge(left=self.results(), right=self._metaData(level), on=level)
         cols = [x for x in self.extData.columns if x != self.column]
         cols = cols + [self.column]
