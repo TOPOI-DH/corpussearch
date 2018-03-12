@@ -53,12 +53,12 @@ class CorpusTextSearch(object):
         self.colValueDictTrigger = []
         if self.dataindex == 'single':
             for col in self.dataframe.columns:
-                if not self.dataframe[col].dtype.name in ['int','int64','float64']:
+                if not self.dataframe[col].dtype.name in ['int', 'int64', 'float64']:
                     if len(self.dataframe[col].unique()) < maxValues:
                         self.colValueDictTrigger.append(col)
         elif self.dataindex == 'multi':
             for level in self.dataframe.index.names:
-                if not self.dataframe.index.get_level_values(level).dtype.name in ['int','int64','float64']:
+                if not self.dataframe.index.get_level_values(level).dtype.name in ['int', 'int64', 'float64']:
                     if len(self.dataframe.index.get_level_values(level).unique()) < maxValues:
                         self.colValueDictTrigger.append(level)
 
