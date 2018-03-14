@@ -94,22 +94,24 @@ class CorpusTextSearch(object):
             self.result = self.result[self.result[self.column].str.contains(value)]
         return self
 
-    def logicReduce(self,logicList):
+    def logicReduce(self, logicList):
         """
-        Constructs complex searches for list of (part,value) tuples, connected via
-        AND (&),OR (|),NOT (~&) logic.
-        logicList has the format '[(part1,value1),&,(part2,value2),|,(part3,value3)]'.
-        Evaluation is in order of apperance, e.g. for the above logicList, a boolean list is constructed
-        for each (part,value) tuple. Then the first two tuples are compared with & yielding a temporary
-        result temp1, which is compared with | with the last tuple. This creates a resulting boolean list res1,
+        Constructs complex searches for list of (part,value) tuples, connected
+        via AND (&),OR (|),NOT (~&) logic. logicList has the format
+        '[(part1,value1),&,(part2,value2),|,(part3,value3)]'.
+        Evaluation is in order of apperance, e.g. for the above logicList,
+        a boolean list is constructed for each (part,value) tuple.
+        Then the first two tuples are compared with & yielding a temporary
+        result temp1, which is compared with | with the last tuple.
+        This creates a resulting boolean list res1,
         which is used to reduce the dataframe.
         """
         self.tempRes = []
         for part in logicList:
-            if type(part)==tuple:
-                dfTemp = self.dataframe[part[0]].str.contains(part[1]) == True
-                self.tempRes.append(dfTemp)
-            elif type(part)==str and part in ['&','|','~&']:
+            if type(part) == tuple:
+                res = self.boolList(part[0], part[1])
+                self.tempRes.append(res)
+            elif type(part) == str and part in ['&', '|', '~&']:
                 self.tempRes.append(part)
 
         self.res = self.tempRes.pop(0)
@@ -127,24 +129,22 @@ class CorpusTextSearch(object):
                 pass
 
         if type(self.res) != str:
-            if type(self.result) == str:
-                self.result = self.dataframe[self.res]
-            else:
-                self.result = self.result[self.res]
+            self.result = self.dataframe[self.res]
         return self
 
-    def reduce(self, level, value):
-        """ Return reduced dataframe for search tuple (level/column,value):
-            a) as cross-section for multi-index dataframe:
-               df.xs(value,level=level)
-            b) as sub-dataframe for single-index dataframe:
-               df[df.column == value]
+    def boolList(self, level, value):
+        """ Returns boolean list for dataframe[part]==value."""
+        if self.dataindex == 'multi' and level != self.column:
+            res = self.dataframe.index.get_level_values(level) == self._fuzzySearch(level, value)
+        elif self.dataindex == 'single' and level != self.column:
+            res = self.dataframe[level] == self._fuzzySearch(level, value)
+        elif level == self.column:
+            res = self.dataframe[level].str.contains(value) == True
+        return res
 
-            Result is in self.result, to be able to chain reductions.
-            To view result use self.results()
-        """
-
-        if level in self.colValueDictTrigger:
+    def _fuzzySearch(self, level, value):
+        """Allow fuzzy search."""
+        if level in self.colValueDictTrigger and level != self.column:
             if level not in self.levelValues.keys():
                 if self.dataindex == 'multi':
                     self.levelValues[level] = self.dataframe.index.get_level_values(level).unique()
@@ -170,9 +170,23 @@ class CorpusTextSearch(object):
                     searchValue = value
             else:
                 searchValue = value
-            self._searchString(level, searchValue)
         else:
-            self._searchString(level, value)
+            searchValue = value
+        return searchValue
+
+    def reduce(self, level, value):
+        """ Return reduced dataframe for search tuple (level/column,value):
+            a) as cross-section for multi-index dataframe:
+               df.xs(value,level=level)
+            b) as sub-dataframe for single-index dataframe:
+               df[df.column == value]
+
+            Result is in self.result, to be able to chain reductions.
+            To view result use self.results()
+        """
+
+        searchValue = self._fuzzySearch(level, value)
+        self._searchString(level, searchValue)
         return self
 
     def _searchString(self, level, value):
@@ -190,7 +204,7 @@ class CorpusTextSearch(object):
 
     def _assertDataType(self, level, value, dataframe):
         """Helper function to assert correct datatype for value at level"""
-        intTypes = ['int8', 'int16', 'int32', 'int64', 'float','float64']
+        intTypes = ['int8', 'int16', 'int32', 'int64', 'float', 'float64']
         valueType = type(value)
         if self.dataindex == 'multi':
             levelType = dataframe.index.get_level_values(level=level).dtype.name
