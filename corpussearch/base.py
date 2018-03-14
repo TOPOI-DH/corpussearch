@@ -94,6 +94,45 @@ class CorpusTextSearch(object):
             self.result = self.result[self.result[self.column].str.contains(value)]
         return self
 
+    def logicReduce(self,logicList):
+        """
+        Constructs complex searches for list of (part,value) tuples, connected via
+        AND (&),OR (|),NOT (~&) logic.
+        logicList has the format '[(part1,value1),&,(part2,value2),|,(part3,value3)]'.
+        Evaluation is in order of apperance, e.g. for the above logicList, a boolean list is constructed
+        for each (part,value) tuple. Then the first two tuples are compared with & yielding a temporary
+        result temp1, which is compared with | with the last tuple. This creates a resulting boolean list res1,
+        which is used to reduce the dataframe.
+        """
+        self.tempRes = []
+        for part in logicList:
+            if type(part)==tuple:
+                dfTemp = self.dataframe[part[0]].str.contains(part[1]) == True
+                self.tempRes.append(dfTemp)
+            elif type(part)==str and part in ['&','|','~&']:
+                self.tempRes.append(part)
+
+        self.res = self.tempRes.pop(0)
+
+        while self.tempRes:
+            op = self.tempRes.pop(0)
+            res2 = self.tempRes.pop(0)
+            if op == '&':
+                self.res = self.res & res2
+            elif op == '|':
+                self.res = self.res | res2
+            elif op == '~&':
+                self.res = self.res & np.invert(res2)
+            else:
+                pass
+
+        if type(self.res) != str:
+            if type(self.result) == str:
+                self.result = self.dataframe[self.res]
+            else:
+                self.result = self.result[self.res]
+        return self
+
     def reduce(self, level, value):
         """ Return reduced dataframe for search tuple (level/column,value):
             a) as cross-section for multi-index dataframe:
