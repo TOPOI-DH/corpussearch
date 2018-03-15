@@ -29,13 +29,13 @@ from corpussearch.base import CorpusTextSearch
 The class is instantiated by providing the path to the source file. Excepted
 formats are pickled dataframes, CSV, JSON or Excel files.
 
-Standard parameters assume pickled, multiindexed dataframes, where the main text
+Standard parameters assume pickled, multi-indexed dataframes, where the main text
 is contained in a column 'text'. For other sources change parameters accordingly.
 ```python
   search = CorpusTextSearch('./path/to/dataframe/file.pickle')
 ```
 A reduction to a specific part and page number is obtained by chaining the desired
-reductions `.reduce(key,value)`, where `key` can be either a level of the multiindex, or a column name. To obtain the resulting dataframe, `.results()` is added.
+reductions `.reduce(key,value)`, where `key` can be either a level of the multi index, or a column name. To obtain the resulting dataframe, `.results()` is added.
 
 ```python
   result = search.reduce('part','part_name').reduce('page','page_number').results()
@@ -45,7 +45,7 @@ reductions `.reduce(key,value)`, where `key` can be either a level of the multii
 
 **Attention:** *Work in progress*
 
-Import the gui part of the package into a Jupyter Notebook
+Import the GUI part of the package into a Jupyter Notebook
 ```python
 from corpussearch.gui import CorpusGUI
 ```
@@ -59,10 +59,10 @@ and display the interface
   gui.displayGUI()
 ```
 
-A basic word search returns all results where the searchword is contained in the main column, e.g. 'text'. Search values can contain regular expressions, e.g. `\d{2,4}\s[A-Z]`.
-For search in parts other then the main column, fuzzy searches are possible if the number of unique values on that level is less than `maxValues`. This routine uses `difflib` to compare the searchstring to possible values on that level. This can help if the actual string formating is not well known, but could possibely lead to undesired results.
+A basic word search returns all results where the search word is contained in the main column, e.g. 'text'. Search values can contain regular expressions, e.g. `\d{2,4}\s[A-Z]`.
+For search in parts other then the main column, fuzzy searches are possible if the number of unique values on that level is less than `maxValues`. This routine uses `difflib` to compare the search string to possible values on that level. This can help if the actual string formating is not well known, but could possibly lead to undesired results.
 
-Results are displayed in the sentence output boxes, where the right box contains metainformation derived from the non-main columns or multiindex levels.
+Results are displayed in the sentence output boxes, where the right box contains meta-information derived from the non-main columns or multi-index levels.
 
 To navigate between results use the 'previous' and 'next' buttons.
 

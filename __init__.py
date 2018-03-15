@@ -1,2 +1,2 @@
-from corpussearch.base import CorpusTextSearch as Search
-from corpussearch.gui import CorpusGUI as GUI
+from corpussearch.base import CorpusTextSearch
+from corpussearch.gui import CorpusGUI

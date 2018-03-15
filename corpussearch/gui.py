@@ -86,20 +86,20 @@ class CorpusGUI(CorpusTextSearch):
 
         self.outSentence = widgets.Textarea(
             value='',
-            layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='500px'),
+            layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='70%'),
             placeholder='Sentence'
         )
 
         self.outMeta = widgets.Textarea(
             placeholder='Result',
-            layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='500px'),
+            layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='30%'),
             description='Result:',
             value=''
         )
 
     def _setDescription(self):
         res = 'number {0}\n'.format(self.counter) + '\n'.join(
-             ["{0}. {1}".format(x,y) for x,y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
+             ["{0}. {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
         )
         return res
 
