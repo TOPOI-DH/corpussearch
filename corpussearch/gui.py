@@ -21,27 +21,27 @@ class SearchWordGUI(widgets.HBox):
         #############
         # Functions #
         #############
-        def chgTxt(change):
-            self._text.value = change['new']
+        #def chgTxt(change):
+        #    self._text.value = change['new']
 
         ###########
         # Widgets #
         ###########
-        self._text = widgets.Text(description='Search for:', placeholder='Enter search word')
+        self._text = widgets.Text(description='Search for:', placeholder='term')
         self._text.layout.margin = '0 0 0 20px'
 
         self._select = widgets.Dropdown(
-            description='Values:',
+            description='Search in:',
             options=self.optList,
             value=self.column,
         )
         ###########
         # Actions #
         ###########
-        self._select.observe(
-            chgTxt,
-            names='value'
-        )
+        #self._select.observe(
+        #    chgTxt,
+        #    names='value'
+        #)
 
         children = [self._text, self._select]
         self.children = children
@@ -93,13 +93,13 @@ class CorpusGUI(CorpusTextSearch):
         self.outMeta = widgets.Textarea(
             placeholder='Result',
             layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='30%'),
-            description='Result:',
+            #description='Result:',
             value=''
         )
 
     def _setDescription(self):
-        res = 'number {0}\n'.format(self.counter) + '\n'.join(
-             ["{0}. {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
+        res = 'Result {0}\n'.format(self.counter) + '\n'.join(
+             ["{0}:\n {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
         )
         return res
 

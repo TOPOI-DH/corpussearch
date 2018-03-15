@@ -31,15 +31,39 @@ formats are pickled dataframes, CSV, JSON or Excel files.
 
 Standard parameters assume pickled, multi-indexed dataframes, where the main text
 is contained in a column 'text'. For other sources change parameters accordingly.
+
+Using a pre-pickled dataframe:
 ```python
   search = CorpusTextSearch('./path/to/dataframe/file.pickle')
 ```
+
+Using data in excel format:
+```python
+  search = CorpusTextSearch(
+      pathDF='./path/to/excel/file.xlsx'
+      dataType='excel',
+      dataIndex='single'
+  )
+```
+
 A reduction to a specific part and page number is obtained by chaining the desired
 reductions `.reduce(key,value)`, where `key` can be either a level of the multi index, or a column name. To obtain the resulting dataframe, `.results()` is added.
 
 ```python
   result = search.reduce('part','part_name').reduce('page','page_number').results()
 ```
+
+To restart a search, e.g. within another part, use
+```python
+  search.resetSearch()
+```
+
+Additional search logic can be used with `.logicReduce()`. The method accepts a
+list of reductions chained with logical AND,OR, or NOT. For example,
+```python
+  search.logicReduce([('part','Part1'),&,('page','10'),|,('text','TEST')]).result()
+```
+will return the entries of a dataframe where part is Part1 and page number is 10, or the text string contains TEST. 
 
 # GUI usage
 
