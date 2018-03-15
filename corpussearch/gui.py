@@ -92,6 +92,7 @@ class CorpusGUI(CorpusTextSearch):
 
         self.outMeta = widgets.Textarea(
             placeholder='Result',
+            layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='500px'),
             description='Result:',
             value=''
         )
@@ -115,7 +116,7 @@ class CorpusGUI(CorpusTextSearch):
         return
 
     def _addSearchField(self, widget, content, buffers):
-        child = self.initSearch
+        child = SearchWordGUI(self.colValueDictTrigger, self.column)
         children = []
         for ch in self.accordion.children:
             children.append(ch)

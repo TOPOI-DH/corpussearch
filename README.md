@@ -59,7 +59,8 @@ and display the interface
   gui.displayGUI()
 ```
 
-A basic word search returns all results where the searchword is contained in the main column, e.g. 'text'.
+A basic word search returns all results where the searchword is contained in the main column, e.g. 'text'. Search values can contain regular expressions, e.g. `\d{2,4}\s[A-Z]`.
+For search in parts other then the main column, fuzzy searches are possible if the number of unique values on that level is less than `maxValues`. This routine uses `difflib` to compare the searchstring to possible values on that level. This can help if the actual string formating is not well known, but could possibely lead to undesired results.
 
 Results are displayed in the sentence output boxes, where the right box contains metainformation derived from the non-main columns or multiindex levels.
 

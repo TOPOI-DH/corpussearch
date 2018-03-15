@@ -12,7 +12,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.7",
+    version="0.0.8",
 
     # Application author details:
     author="Malte Vogl",
@@ -45,7 +45,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/TOPOI-DH/corpussearch/',
         'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.7.tar.gz',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.8.tar.gz',
     },
 
     python_requires='>=3',
@@ -53,6 +53,7 @@ setup(
     # Dependent packages (distributions)
     install_requires=[
         "pandas",
+        "numpy",
         "citableclass",
         "ipywidgets",
         "Ipython",
