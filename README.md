@@ -3,9 +3,9 @@
 A tool to load and search in text corpora.
 
 The tool provides routines to search in large corpora in pandas dataframe format, where rows contain textual information on the level of sentences or paragraphs.
-Dataframes can be single or multilevel indexed and loaded from url, doi or local files. Accepted formats are pickle, excel, json and csv.
+Dataframes can be single or multilevel indexed and loaded from URL, DOI, [citable](http://www.edition-topoi.org/publishing_with_us/citable) or local files. Accepted file formats are pickle, excel, json and csv.
 
-This package is designed to work with Jupyter Notebooks as well as in the IPython command line. If used in a Notebook, the search can be done through a GUI.
+This package is designed to work with Jupyter Notebooks as well as in the IPython command line. If used in a Notebook, the user has access to a search GUI.
 
 # Installation
 
@@ -32,6 +32,8 @@ formats are pickled dataframes, CSV, JSON or Excel files.
 Standard parameters assume pickled, multi-indexed dataframes, where the main text
 is contained in a column 'text'. For other sources change parameters accordingly.
 
+## Loading data
+
 Using a pre-pickled dataframe:
 ```python
   search = CorpusTextSearch('./path/to/dataframe/file.pickle')
@@ -45,6 +47,18 @@ Using data in excel format:
       dataIndex='single'
   )
 ```
+
+Loading data in excel format from a DOI:
+```python
+  search = CorpusTextSearch(
+      pathDF='10.17171/1-6-90'
+      pathType='DOI',
+      dataType='excel',
+      dataIndex='single'
+  )
+```
+
+## Search for text and/or parts
 
 A reduction to a specific part and page number is obtained by chaining the desired
 reductions `.reduce(key,value)`, where `key` can be either a level of the multi index, or a column name. To obtain the resulting dataframe, `.results()` is added.
@@ -63,7 +77,7 @@ list of reductions chained with logical AND,OR, or NOT. For example,
 ```python
   search.logicReduce([('part','Part1'),&,('page','10'),|,('text','TEST')]).result()
 ```
-will return the entries of a dataframe where part is Part1 and page number is 10, or the text string contains TEST. 
+will return the entries of a dataframe where part is Part1 and page number is 10, or the text string contains TEST.
 
 # GUI usage
 
