@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
-with open('README.md') as f:
-    readme = f.read()
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
 
 setup(
     # Application name:
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.6",
+    version="0.0.7",
 
     # Application author details:
     author="Malte Vogl",
@@ -28,7 +31,7 @@ setup(
     license='GPLv3',
     description="Tools for loading and analyzing large text corpora.",
 
-    long_description=readme,
+    long_description=long_description,
 
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -42,7 +45,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/TOPOI-DH/corpussearch/',
         'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.6.tar.gz',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.7.tar.gz',
     },
 
     python_requires='>=3',
