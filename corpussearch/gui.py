@@ -115,7 +115,7 @@ class CorpusGUI(CorpusTextSearch):
         return
 
     def _addSearchField(self, widget, content, buffers):
-        child = SearchWordGUI(self.colValueDictTrigger, self.column)
+        child = self.initSearch
         children = []
         for ch in self.accordion.children:
             children.append(ch)
