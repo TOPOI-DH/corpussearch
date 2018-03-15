@@ -1,7 +1,7 @@
 Making a New Release
 ====================
 
- - create and upload a new github tag
+ - create and upload a new github tag == version
  - version++ for 'version' and 'download url'
 
 ```python
@@ -13,11 +13,9 @@ Making a New Release
     )
 ```
 
- - add a github tag == version
  - run these commands:
 
 ```bash
-python setup.py bdist_wheel --universal
-python setup.py sdist
+python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
