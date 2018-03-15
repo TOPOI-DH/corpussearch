@@ -12,7 +12,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.9",
+    version="0.0.10",
 
     # Application author details:
     author="Malte Vogl",
@@ -45,7 +45,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/TOPOI-DH/corpussearch/',
         'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.9.tar.gz',
+        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.10.tar.gz',
     },
 
     python_requires='>=3',
@@ -57,6 +57,8 @@ setup(
         "citableclass",
         "ipywidgets",
         "Ipython",
+        "gensim",
+        "cltk"
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

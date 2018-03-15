@@ -1,2 +1,8 @@
 nose
 pandas
+numpy
+citableclass
+ipywidgets
+IPython
+gensim
+cltk
