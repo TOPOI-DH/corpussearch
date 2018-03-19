@@ -38,6 +38,7 @@ class CorpusML(CorpusTextSearch):
         self.language = language
 
         if self.language == 'latin':
+            # TODO: preloading of cltk packages 
             from cltk.stem.lemma import LemmaReplacer
             from cltk.stem.latin.j_v import JVReplacer
             from cltk.stop.latin.stops import STOPS_LIST as stopwords
