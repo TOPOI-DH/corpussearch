@@ -6,3 +6,4 @@ ipywidgets
 IPython
 gensim
 cltk
+xlrd

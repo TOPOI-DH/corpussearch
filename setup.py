@@ -54,11 +54,12 @@ setup(
     install_requires=[
         "pandas",
         "numpy",
+        "xlrd",
         "citableclass",
         "ipywidgets",
         "Ipython",
         "gensim",
-        "cltk"
+        "cltk",
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

@@ -37,15 +37,30 @@ class CorpusML(CorpusTextSearch):
 
         self.language = language
 
-        if self.language == 'latin':
-            # TODO: preloading of cltk packages 
+        if self.language == 'latin' or self.language == 'greek':
+            from cltk.corpus.utils.importer import CorpusImporter
+            corpus_importer = CorpusImporter(self.language)
+            corpus_importer.import_corpus(
+                '{0}_models_cltk'.format(self.language)
+                )
             from cltk.stem.lemma import LemmaReplacer
-            from cltk.stem.latin.j_v import JVReplacer
-            from cltk.stop.latin.stops import STOPS_LIST as stopwords
             from cltk.tokenize.word import nltk_tokenize_words as tokenizer
-            self.jvreplacer = JVReplacer()
-            lemmatizer = LemmaReplacer('latin')
-
+            lemmatizer = LemmaReplacer(self.language)
+            if self.language == 'latin':
+                from cltk.stem.latin.j_v import JVReplacer
+                from cltk.stop.latin.stops import STOPS_LIST as stopwords
+                self.jvreplacer = JVReplacer()
+            elif self.language == 'greek':
+                from cltk.stop.greek.stops import STOPS_LIST as stopwords
+        elif self.language == 'english':
+            from nltk.stem import WordNetLemmatizer
+            from nltk.tokenize import word_tokenize as tokenizer
+            from nltk.corpus import stopwords
+            lemmatizer = WordNetLemmatizer()
+        else:
+            raise ValueError(
+                'Could not find lemmatizer, tokenizer,\
+                 and stopwords for chosen language.')
         self.lemmatizer = lemmatizer
         self.tokenizer = tokenizer
         self.stopwords = stopwords
