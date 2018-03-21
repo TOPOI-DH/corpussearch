@@ -30,7 +30,7 @@ class CorpusML(CorpusTextSearch):
             )
 
         self.model = gensim.models.Word2Vec(
-            workers=4, min_count=5, size=300
+            workers=4, minsav_count=5, size=300
             )
 
         self.model.random.seed(42)
@@ -53,9 +53,12 @@ class CorpusML(CorpusTextSearch):
             elif self.language == 'greek':
                 from cltk.stop.greek.stops import STOPS_LIST as stopwords
         elif self.language == 'english':
+            import nltk
+            nltk.download('stopwords')
             from nltk.stem import WordNetLemmatizer
             from nltk.tokenize import word_tokenize as tokenizer
             from nltk.corpus import stopwords
+            stopwords = stopwords.words()
             lemmatizer = WordNetLemmatizer()
         else:
             raise ValueError(
