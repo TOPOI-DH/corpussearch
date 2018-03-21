@@ -131,7 +131,10 @@ class CorpusML(CorpusTextSearch):
         """
         Builds model vocabulary.
         """
-        loadedData = pd.read_pickle(self.tempFile)
+        if self.tempFile:
+            loadedData = pd.read_pickle(self.tempFile)
+        else:
+            self.saveTrainData()
         self.training_data = loadedData.training_data.values.tolist()
         self.model.build_vocab(self.training_data)
         return
@@ -140,6 +143,8 @@ class CorpusML(CorpusTextSearch):
         """
         Trains model based on created training data.
         """
+        if not self.training_data:
+            self.buildVocab()
         self.model.train(
             self.training_data,
             total_examples=self.model.corpus_count,
@@ -147,7 +152,7 @@ class CorpusML(CorpusTextSearch):
             )
         return
 
-    def getSimilarContext(word):
+    def getSimilarContext(self,word):
         """
         Returns words occuring in the corpus with similar context. If the word
         is not contained in the training vocabulary, a similiar word is choosen
