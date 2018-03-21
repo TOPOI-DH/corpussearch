@@ -96,7 +96,7 @@ class CorpusML(CorpusTextSearch):
     def buildVocab(self):
         loadedData = pd.read_pickle(self.tempFile)
         self.training_data = loadedData.training_data.values.tolist()
-        self.model.build_vocab(training_data)
+        self.model.build_vocab(self.training_data)
         return
 
     def trainModel(self):
