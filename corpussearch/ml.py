@@ -37,7 +37,8 @@ class CorpusML(CorpusTextSearch):
     def __init__(
             self, pathDF, language='english',
             dataType='pickle', dataIndex='multi', colname='text',
-            maxValues=2500, pathMeta=False, pathType=False, showLogging=False
+            maxValues=2500, pathMeta=False, pathType=False, showLogging=False,
+            model_params=(4,5,300)
             ):
 
         super(CorpusML, self).__init__(
@@ -52,10 +53,12 @@ class CorpusML(CorpusTextSearch):
                 )
 
         self.model = gensim.models.Word2Vec(
-            workers=4, min_count=5, size=300
+            workers=model_params[0],
+            min_count=model_params[0],
+            size=model_params[0]
             )
 
-        self.model.random.seed(42)
+        # self.model.random.seed(42)
 
         self.language = language
 
