@@ -175,7 +175,7 @@ class CorpusGUI(CorpusTextSearch):
             # TODO: Add plotting logic in handle_submit(sender)
             # handle_submit(sender)
 
-            self.outSentence.value = re.sub('\n|\s+', ' ', self.displayResult[self.column].iloc[self.counter])
+            self.outSentence.value = re.sub(r'\n|\s+', ' ', self.displayResult[self.column].iloc[self.counter])
             self.outMeta.value = self._setDescription()
             with self.outInfo:
                 clear_output()

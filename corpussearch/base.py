@@ -274,7 +274,7 @@ class CorpusTextSearch(object):
     def _countWords(self, level, value):
         """Helper function to count words on a given level."""
         text = ' '.join(self.dataframe.xs(value, level=level).text.tolist())
-        numWords = len(re.findall('\w+', text))
+        numWords = len(re.findall(r'\w+', text))
         return numWords
 
     def _getStatistics(self, level):

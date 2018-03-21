@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
 from ..base import CorpusTextSearch
+from ..ml import CorpusML
+from ..gui import CorpusGUI
+from ..vis import CorpusVisualization
 
 from unittest import TestCase
 
@@ -52,6 +55,54 @@ class TestCorpusTextSearch(TestCase):
                     .reduce('page', 10).extResults('part')
         self.assertEqual(testdt.shape[0], 1)
         self.assertEqual(testdt.words.values[0], 117)
+
+
+class TestCorpusML(TestCase):
+    """Basic import test"""
+    def setUp(self):
+        self.test1 = CorpusML(
+            pathDF=os.path.join(DATA, 'dfTest.csv'),
+            dataType='csv',
+            dataIndex='single'
+            )
+        self.test2 = CorpusML(
+            pathDF=os.path.join(DATA, 'dfTest.pickle'),
+            dataType='pickle'
+            )
+
+    def TestImportException(self):
+        self.assertRaises(TypeError, CorpusML)
+
+
+class TestCorpusGUI(TestCase):
+    """Basic import test"""
+    def setUp(self):
+        self.test1 = CorpusGUI(
+            pathDF=os.path.join(DATA, 'dfTest.csv'),
+            dataType='csv',
+            dataIndex='single'
+            )
+        self.test2 = CorpusGUI(
+            pathDF=os.path.join(DATA, 'dfTest.pickle'),
+            dataType='pickle'
+            )
+
+    def TestImportException(self):
+        self.assertRaises(TypeError, CorpusGUI)
+
+
+class TestCorpusVisual(TestCase):
+    """Basic import test"""
+    def setUp(self):
+        self.test1 = CorpusVisualization()
+
+    def TestImportException(self):
+        def func1():
+            try:
+                CorpusVisualization(pathDF=os.path.join(DATA, 'dfTest.pickle'))
+            except TypeError:
+                raise
+        self.assertRaises(TypeError, func1)
 
 
 if __name__ == '__main__':
