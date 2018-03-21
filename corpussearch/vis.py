@@ -13,7 +13,8 @@ class CorpusVisualization(object):
     Visualization layer for corpus search.
     """
 
-    def __init__(self):
+    def __init__(self,search):
+        self.search = search
         self.plotDict = {}
         plt.style.use('seaborn-deep')
 
@@ -38,7 +39,7 @@ class CorpusVisualization(object):
         """Basic initalization for matplotlib figure."""
         clear_output()
         xticks = []
-        for vol in set(self.dataframe.index.get_level_values('volume').tolist()):
+        for vol in set(self.search.dataframe.index.get_level_values('volume').tolist()):
             xticks.append((vol))
 
         xtickslabels = sorted(xticks, key=lambda x: x[0])
