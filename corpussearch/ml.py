@@ -30,7 +30,7 @@ class CorpusML(CorpusTextSearch):
             )
 
         self.model = gensim.models.Word2Vec(
-            workers=4, minsav_count=5, size=300
+            workers=4, min_count=5, size=300
             )
 
         self.model.random.seed(42)
