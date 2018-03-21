@@ -129,10 +129,11 @@ class CorpusML(CorpusTextSearch):
         """
         Builds model vocabulary.
         """
-        try self.tempFile:
-            loadedData = pd.read_pickle(self.tempFile)
+        try:
+            self.tempFile
         except AttributeError:
             self.saveTrainData()
+        loadedData = pd.read_pickle(self.tempFile)
         self.training_data = loadedData.training_data.values.tolist()
         self.model.build_vocab(self.training_data)
         return
@@ -141,8 +142,8 @@ class CorpusML(CorpusTextSearch):
         """
         Trains model based on created training data.
         """
-        try self.training_data:
-            pass
+        try:
+            self.training_data
         except AttributeError:
             self.buildVocab()
         self.model.train(
