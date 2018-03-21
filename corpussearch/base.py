@@ -15,9 +15,14 @@ class CorpusTextSearch(object):
     For other import formats change read_pickle and read_excel accordingly.
 
     Example:
-            >>> search1 = SearchPhrases(
-                            '[Ss]ol','text,'/path/to/kepler/dataframe'
+            >>> search1 = CorpusTextSearch(
+                            pathDF='/path/to/dataframe/file.xlsx',
+                            dataType='excel',
+                            dataIndex='single',
+                            colname='main'
                             )
+
+            >>> search1.reduce('date','1500').search('Thomas Morus').results()
             True
     """
 
@@ -86,13 +91,13 @@ class CorpusTextSearch(object):
         return
 
     def resetSearch(self):
-        """Reset self.result to full dataframe."""
+        """Reset self.result to search in full dataframe again."""
         self.result = ''
         return
 
     def search(self, value):
         """
-        Search string in colname column.
+        Search string in 'colname' column.
         """
         if type(self.result) == str:
             self.result = self.dataframe[self.dataframe[self.column].str.contains(value)]
@@ -149,7 +154,11 @@ class CorpusTextSearch(object):
         return res
 
     def _fuzzySearch(self, level, value):
-        """Allow fuzzy search."""
+        """
+        Allow fuzzy search for reduce() and search() routines. Limited to
+        columns in the colValueDictTrigger list. This excludes columns containing
+        numerical data, as well as the main column 'colname'.
+        """
         if level in self.colValueDictTrigger and level != self.column:
             if level not in self.levelValues.keys():
                 if self.dataindex == 'multi':
@@ -209,8 +218,8 @@ class CorpusTextSearch(object):
                 self.result = self.result[self.result[level] == self._assertDataType(level, value, self.result)]
 
     def _assertDataType(self, level, value, dataframe):
-        """Helper function to assert correct datatype for value at level"""
-        intTypes = ['int8', 'int16', 'int32', 'int64', 'float', 'float64']
+        """Helper function to assert correct datatype for value at level or in column"""
+        numTypes = ['int8', 'int16', 'int32', 'int64', 'float', 'float64']
         valueType = type(value)
         if self.dataindex == 'multi':
             levelType = dataframe.index.get_level_values(level=level).dtype.name
@@ -223,11 +232,11 @@ class CorpusTextSearch(object):
                 return str(value)
             except ValueError as err:
                 raise('Can not cast {0} to type {1}'.format(value, levelType))
-        elif levelType in intTypes and valueType == int:
+        elif levelType in numTypes and valueType == int:
             return value
-        elif levelType in intTypes and valueType == float:
+        elif levelType in numTypes and valueType == float:
             return value
-        elif levelType in intTypes and valueType == str:
+        elif levelType in numTypes and valueType == str:
             try:
                 return int(value)
             except ValueError:
@@ -251,6 +260,7 @@ class CorpusTextSearch(object):
         metadata on the desired level. The metadata is calculated for all other
         levels of multi-indexed dataframe.
         """
+        # TODO: Add statistics for single-level dataframes.
         if not self.dataindex == 'multi':
             print('Statistics for multiindexed dataframes only.')
             return

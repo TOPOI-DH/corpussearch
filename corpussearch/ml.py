@@ -17,7 +17,31 @@ logging.basicConfig(
 
 
 class CorpusML(CorpusTextSearch):
+    """
+    Machine learning routines for corpussearch.
 
+    Trains gensim's Word2Vec for data contained in 'colname' column. Usefull
+    to obtain word-contexts for additional searches. Expects additional
+    inital key: language, to determine tokenizers, lemmatizers, and stopwords.
+
+    Currently supported languages (using CLTK and NLTK): latin, greek, english
+
+    Example:
+            >>> ml1 = CorpusML(
+                            pathDF='/path/to/dataframe/file.xlsx',
+                            dataType='excel',
+                            dataIndex='single',
+                            colname='main',
+                            language='english'
+                            )
+
+            >>> ml1.saveTrainData()
+            >>> ml1.buildVocab()
+            >>> ml1.trainModel()
+
+            >>> ml1.getSimilarContext('word1')
+            True
+    """
     def __init__(
             self, pathDF, language='english',
             dataType='pickle', dataIndex='multi', colname='text',
@@ -69,13 +93,19 @@ class CorpusML(CorpusTextSearch):
         self.stopwords = stopwords
 
     def convert(self, row):
+        """
+        Helper function: Converts input data from 'colname'-column to a
+        tokenized, lemmatized, and cleaned word list without stopwords.
+
+        Additionaly, for latin language CLTK's jvreplace is applied.
+        """
         reg = re.compile('[^a-zA-Z0-9]')
         if type(row) == str:
             sentence = self.tokenizer(row)
             sentence = [x.lower() for x in sentence]
             sentence = [x for x in sentence if x not in self.stopwords]
-            sentence = [x for x in sentence if x and len(x) > 1]
             sentence = [reg.sub('', x) for x in sentence]
+            sentence = [x for x in sentence if x and len(x) > 1]
             sentence = [x.strip('0123456789') for x in sentence]
             if self.language == 'latin':
                 sentence = [self.jvreplacer.replace(word) for word in sentence]
@@ -86,6 +116,10 @@ class CorpusML(CorpusTextSearch):
             return sentence
 
     def saveTrainData(self):
+        """
+        Creates new training data column,
+        by applying convert() to 'colname' column.
+        """
         self.dataframe['training_data'] = self.dataframe[self.column].apply(
             lambda row: self.convert(row)
         )
@@ -94,12 +128,18 @@ class CorpusML(CorpusTextSearch):
         return
 
     def buildVocab(self):
+        """
+        Builds model vocabulary.
+        """
         loadedData = pd.read_pickle(self.tempFile)
         self.training_data = loadedData.training_data.values.tolist()
         self.model.build_vocab(self.training_data)
         return
 
     def trainModel(self):
+        """
+        Trains model based on created training data.
+        """
         self.model.train(
             self.training_data,
             total_examples=self.model.corpus_count,
@@ -108,6 +148,11 @@ class CorpusML(CorpusTextSearch):
         return
 
     def getSimilarContext(word):
+        """
+        Returns words occuring in the corpus with similar context. If the word
+        is not contained in the training vocabulary, a similiar word is choosen
+        using difflib's get_close_matches.
+        """
         vocabulary = self.model.wv.vocab.keys()
         if word in vocabulary:
             res = self.model.wv.most_similar(word)

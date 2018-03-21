@@ -11,6 +11,10 @@ from .base import CorpusTextSearch
 
 
 class SearchWordGUI(widgets.HBox):
+    """
+    Helper Class, defines single logical element of according, to enable
+    more complex search patterns.
+    """
     def __init__(self, optionList, colName):
         super(SearchWordGUI, self).__init__()
         self.optList = optionList
@@ -18,15 +22,6 @@ class SearchWordGUI(widgets.HBox):
         if self.column not in self.optList:
             self.optList.extend([colName])
 
-        #############
-        # Functions #
-        #############
-        #def chgTxt(change):
-        #    self._text.value = change['new']
-
-        ###########
-        # Widgets #
-        ###########
         self._text = widgets.Text(description='Search for:', placeholder='term')
         self._text.layout.margin = '0 0 0 20px'
 
@@ -35,13 +30,6 @@ class SearchWordGUI(widgets.HBox):
             options=self.optList,
             value=self.column,
         )
-        ###########
-        # Actions #
-        ###########
-        #self._select.observe(
-        #    chgTxt,
-        #    names='value'
-        #)
 
         children = [self._text, self._select]
         self.children = children
@@ -56,7 +44,30 @@ class SearchWordGUI(widgets.HBox):
 
 
 class CorpusGUI(CorpusTextSearch):
+    """
+    GUI wrapper for 'CorpusTextSearch'-class, to be used in Jupyter Notebooks.
+    Initialized with path to data. Search can be in main column 'colname' or
+    other columns containing data in string format.
 
+    Searches can be chained by using the 'more' button. Logical operations are
+    AND, OR, NOT.
+
+    Results are printed in the 'Sentence' field for the 'colname' cells,
+    with corresponding metadata from the other columns in the 'Result' field.
+
+    Navigation through results is possible using 'previous' and 'next' buttons.
+
+    Example:
+            >>> gui1 = CorpusGUI(
+                            pathDF='/path/to/dataframe/file.xlsx',
+                            dataType='excel',
+                            dataIndex='single',
+                            colname='main'
+                            )
+
+            >>> gui1.displayGUI()
+            True
+    """
     def __init__(
             self, pathDF,
             dataType='pickle', dataIndex='multi', colname='text',
@@ -93,17 +104,18 @@ class CorpusGUI(CorpusTextSearch):
         self.outMeta = widgets.Textarea(
             placeholder='Result',
             layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='30%'),
-            #description='Result:',
             value=''
         )
 
     def _setDescription(self):
+        """ Helper function to display metadata for result"""
         res = 'Result {0}\n'.format(self.counter) + '\n'.join(
              ["{0}:\n {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
         )
         return res
 
     def _setSentence(self, widget, content, buffers):
+        """ Helper function: Navigate and set result to display"""
         if widget.value == 'previous':
             self.counter = self.counter - 1
         elif widget.value == 'next':
@@ -116,6 +128,7 @@ class CorpusGUI(CorpusTextSearch):
         return
 
     def _addSearchField(self, widget, content, buffers):
+        """ Helper function to extend search logic."""
         child = SearchWordGUI(self.colValueDictTrigger, self.column)
         children = []
         for ch in self.accordion.children:
@@ -142,6 +155,10 @@ class CorpusGUI(CorpusTextSearch):
         return
 
     def _searchLogic(self, widget, content, buffers):
+        """
+        Helper function to initialize logical reduction
+        in CorpusTextSearch.logicReduce()
+        """
         self.tempRes = []
         self.tempList = []
         self.counter = 0
@@ -169,6 +186,7 @@ class CorpusGUI(CorpusTextSearch):
                 print('Found no entries. Try changing search!')
 
     def displayGUI(self):
+        """Display the GUI for CorpusTextSearch"""
         searchControl = widgets.HBox([self.extendSearch, self.searchButton, self.outInfo])
         textControl = widgets.HBox([self.direction])
         sentenceFields = widgets.HBox([self.outMeta, self.outSentence])
