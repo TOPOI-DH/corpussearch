@@ -17,6 +17,8 @@ class CorpusML(CorpusTextSearch):
     Trains gensim's Word2Vec for data contained in 'colname' column. Usefull
     to obtain word-contexts for additional searches. Expects additional
     inital key: language, to determine tokenizers, lemmatizers, and stopwords.
+    Model parameters are given as a tuple of numbers,e.g.,
+    '(workers=4,min_count=5,features=300)'.
 
     Currently supported languages (using CLTK and NLTK): latin, greek, english
 
