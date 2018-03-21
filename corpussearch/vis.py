@@ -22,17 +22,22 @@ class CorpusVisualization(object):
             description='Reset plot'
             )
 
+        self.plotLevel = widgets.Text(
+            description='Plot level',
+            value=''
+            )
+
         self.resetPlot.on_msg(
-            self._resetPlotFunc
+            self._resetPlotFunc(widget, content, buffers, self.plotLevel.value)
         )
 
         self.plotout = widgets.Output()
 
-    def _resetPlotFunc(self, widget, content, buffers):
+    def _resetPlotFunc(self, widget, content, buffers, level):
         """Clear all previous plots."""
         self.plotDict.clear()
         with self.plotout:
-            self._initFigure()
+            self._initFigure(level)
             plt.show()
 
     def _initFigure(self,level):
@@ -46,10 +51,10 @@ class CorpusVisualization(object):
                         self.search.levelValues[level] = self.search.dataframe.index.get_level_values(level).unique()
                     elif self.search.dataindex == 'single':
                         self.search.levelValues[level] = self.search.dataframe[level].unique()
-                for vol in set(self.levelValues[level]):
+                for vol in set(self.search.levelValues[level]):
                     xticks.append((vol))
-        except:
-            raise('Can not use {0} for plotting'.format(level))
+        except ValueError:
+            print('Can not use {0} for plotting'.format(level))
 
         xtickslabels = sorted(xticks, key=lambda x: x[0])
 
@@ -87,3 +92,7 @@ class CorpusVisualization(object):
             ax.legend()
 
             plt.show()
+
+    def showVisualButton(self):
+        box = widgets.HBox([plotLevel,resetPlot])
+        display(box)
