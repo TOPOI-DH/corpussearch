@@ -10,12 +10,6 @@ import requests
 from citableclass.base import Citable
 from .base import CorpusTextSearch
 
-logging.basicConfig(
-    format='%(asctime)s : %(levelname)s : %(message)s',
-    level=logging.INFO
-    )
-
-
 class CorpusML(CorpusTextSearch):
     """
     Machine learning routines for corpussearch.
@@ -35,8 +29,6 @@ class CorpusML(CorpusTextSearch):
                             language='english'
                             )
 
-            >>> ml1.saveTrainData()
-            >>> ml1.buildVocab()
             >>> ml1.trainModel()
 
             >>> ml1.getSimilarContext('word1')
@@ -45,13 +37,19 @@ class CorpusML(CorpusTextSearch):
     def __init__(
             self, pathDF, language='english',
             dataType='pickle', dataIndex='multi', colname='text',
-            maxValues=2500, pathMeta=False, pathType=False
+            maxValues=2500, pathMeta=False, pathType=False, logging=False
             ):
 
         super(CorpusML, self).__init__(
             pathDF, dataType, dataIndex, colname,
             maxValues, pathMeta, pathType
             )
+
+        if logging:
+            logging.basicConfig(
+                format='%(asctime)s : %(levelname)s : %(message)s',
+                level=logging.INFO
+                )
 
         self.model = gensim.models.Word2Vec(
             workers=4, min_count=5, size=300
@@ -131,9 +129,9 @@ class CorpusML(CorpusTextSearch):
         """
         Builds model vocabulary.
         """
-        if self.tempFile:
+        try self.tempFile:
             loadedData = pd.read_pickle(self.tempFile)
-        else:
+        except AttributeError:
             self.saveTrainData()
         self.training_data = loadedData.training_data.values.tolist()
         self.model.build_vocab(self.training_data)
@@ -143,7 +141,9 @@ class CorpusML(CorpusTextSearch):
         """
         Trains model based on created training data.
         """
-        if not self.training_data:
+        try self.training_data:
+            pass
+        except AttributeError:
             self.buildVocab()
         self.model.train(
             self.training_data,
@@ -152,7 +152,7 @@ class CorpusML(CorpusTextSearch):
             )
         return
 
-    def getSimilarContext(self,word):
+    def getSimilarContext(self, word):
         """
         Returns words occuring in the corpus with similar context. If the word
         is not contained in the training vocabulary, a similiar word is choosen
