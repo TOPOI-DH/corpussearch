@@ -35,12 +35,21 @@ class CorpusVisualization(object):
             self._initFigure()
             plt.show()
 
-    def _initFigure(self):
+    def _initFigure(self,level):
         """Basic initalization for matplotlib figure."""
         clear_output()
         xticks = []
-        for vol in set(self.search.dataframe.index.get_level_values('volume').tolist()):
-            xticks.append((vol))
+        try:
+            if level in self.search.colValueDictTrigger and level != self.search.column:
+                if level not in self.search.levelValues.keys():
+                    if self.search.dataindex == 'multi':
+                        self.search.levelValues[level] = self.search.dataframe.index.get_level_values(level).unique()
+                    elif self.search.dataindex == 'single':
+                        self.search.levelValues[level] = self.search.dataframe[level].unique()
+                for vol in set(self.levelValues[level]):
+                    xticks.append((vol))
+        except:
+            raise('Can not use {0} for plotting'.format(level))
 
         xtickslabels = sorted(xticks, key=lambda x: x[0])
 
