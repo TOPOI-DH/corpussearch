@@ -37,7 +37,7 @@ class CorpusML(CorpusTextSearch):
     def __init__(
             self, pathDF, language='english',
             dataType='pickle', dataIndex='multi', colname='text',
-            maxValues=2500, pathMeta=False, pathType=False, logging=False
+            maxValues=2500, pathMeta=False, pathType=False, showLogging=False
             ):
 
         super(CorpusML, self).__init__(
@@ -45,7 +45,7 @@ class CorpusML(CorpusTextSearch):
             maxValues, pathMeta, pathType
             )
 
-        if logging:
+        if showLogging:
             logging.basicConfig(
                 format='%(asctime)s : %(levelname)s : %(message)s',
                 level=logging.INFO
@@ -74,13 +74,13 @@ class CorpusML(CorpusTextSearch):
                 self.jvreplacer = JVReplacer()
             elif self.language == 'greek':
                 from cltk.stop.greek.stops import STOPS_LIST as stopwords
-        elif self.language == 'english':
+        elif self.language == 'english' or 'german':
             import nltk
             nltk.download('stopwords')
             from nltk.stem import WordNetLemmatizer
             from nltk.tokenize import word_tokenize as tokenizer
             from nltk.corpus import stopwords
-            stopwords = stopwords.words()
+            stopwords = stopwords.words(self.language)
             lemmatizer = WordNetLemmatizer()
         else:
             raise ValueError(
