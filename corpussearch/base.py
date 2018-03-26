@@ -145,12 +145,13 @@ class CorpusTextSearch(object):
 
     def boolList(self, level, value):
         """ Returns boolean list for dataframe[part]==value."""
+        searchvalue = self._fuzzySearch(level, value)
         if self.dataindex == 'multi' and level != self.column:
-            res = self.dataframe.index.get_level_values(level) == self._fuzzySearch(level, value)
+            res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
         elif self.dataindex == 'single' and level != self.column:
-            res = self.dataframe[level] == self._fuzzySearch(level, value)
+            res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
         elif level == self.column:
-            res = self.dataframe[level].str.contains(value) == True
+            res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
         return res
 
     def _fuzzySearch(self, level, value):
