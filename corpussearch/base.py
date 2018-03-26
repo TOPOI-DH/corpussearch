@@ -222,9 +222,9 @@ class CorpusTextSearch(object):
         """Helper function to assert correct datatype for value at level or in column"""
         numTypes = ['int8', 'int16', 'int32', 'int64', 'float', 'float64']
         valueType = type(value)
-        if self.dataindex == 'multi':
+        if self.dataindex == 'multi' and level != self.column:
             levelType = dataframe.index.get_level_values(level=level).dtype.name
-        elif self.dataindex == 'single':
+        elif self.dataindex == 'single' or level == self.column:
             levelType = self.dataframe[level].dtype.name
         if levelType == 'object' and valueType == str:
             return value

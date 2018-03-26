@@ -12,14 +12,14 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.11",
+    version="0.0.12",
 
     # Application author details:
     author="Malte Vogl",
     author_email="mvogl@mpiwg-berlin.mpg.de",
 
     # Packages
-    packages=find_packages(exclude=('tests','example')),
+    packages=find_packages(exclude=('tests', 'example')),
 
     # Include additional files into the package
     include_package_data=True,
@@ -45,7 +45,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/computational-antiquity/corpussearch/',
         'Tracker': 'https://github.com/computational-antiquity/corpussearch/issues',
-        'Download': 'https://github.com/computational-antiquity/corpussearch/archive/0.0.11.tar.gz',
+        'Download': 'https://github.com/computational-antiquity/corpussearch/archive/0.0.12.tar.gz',
     },
 
     python_requires='>=3',
