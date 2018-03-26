@@ -16,7 +16,7 @@ The package can be installed via `pip`:
 
 Since the package is under active development, the most recent version is always on Github, and can be installed by
 ```
-  pip install git+https://github.com/TOPOI-DH/corpussearch.git
+  pip install git+https://github.com/computational-antiquity/corpussearch.git
 ```
 
 # Basic usage

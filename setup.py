@@ -19,12 +19,12 @@ setup(
     author_email="mvogl@mpiwg-berlin.mpg.de",
 
     # Packages
-    packages=find_packages(exclude=('tests')),
+    packages=find_packages(exclude=('tests','example')),
 
     # Include additional files into the package
     include_package_data=True,
 
-    url='https://github.com/TOPOI-DH/corpussearch/',
+    url='https://github.com/computational-antiquity/corpussearch/',
 
     # Details
 
@@ -43,9 +43,9 @@ setup(
     ],
 
     project_urls={
-        'Home': 'https://github.com/TOPOI-DH/corpussearch/',
-        'Tracker': 'https://github.com/TOPOI-DH/corpussearch/issues',
-        'Download': 'https://github.com/TOPOI-DH/corpussearch/archive/0.0.11.tar.gz',
+        'Home': 'https://github.com/computational-antiquity/corpussearch/',
+        'Tracker': 'https://github.com/computational-antiquity/corpussearch/issues',
+        'Download': 'https://github.com/computational-antiquity/corpussearch/archive/0.0.11.tar.gz',
     },
 
     python_requires='>=3',
