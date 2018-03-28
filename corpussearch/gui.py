@@ -131,7 +131,7 @@ class CorpusGUI(CorpusTextSearch):
     def _setDescription(self):
         """ Helper function to display metadata for result"""
         res = 'Result {0}\n'.format(self.counter) + '\n'.join(
-             ["{0}:\n {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
+             ["{0}: {1}".format(x, y) for x, y in self.displayResult.iloc[self.counter].to_dict().items() if x != self.column]
         )
         return res
 

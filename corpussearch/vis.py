@@ -16,15 +16,16 @@ class CorpusVisualization(CorpusGUI):
     """
 
     def __init__(
-        self, pathDF,
-        dataType='pickle', dataIndex='multi', colname='text',
-        maxValues=2500, pathMeta=False, pathType=False
+            self, pathDF,
+            dataType='pickle', dataIndex='multi', colname='text',
+            maxValues=2500, pathMeta=False, pathType=False
         ):
 
         super(CorpusVisualization, self).__init__(
             pathDF, dataType, dataIndex, colname, maxValues, pathMeta, pathType)
 
         self.plotDict = {}
+
         plt.style.use('seaborn-deep')
 
         self.plot = widgets.Button(
@@ -54,22 +55,24 @@ class CorpusVisualization(CorpusGUI):
         self.plotDict.clear()
         level = self.plotLevel.value
         with self.plotout:
-            self._initFigure(level)
-            plt.show()
+            clear_output()
+            #self._initFigure(level)
+            #plt.show()
 
-    def _initFigure(self, level):
+    def _initFigure(self):
         """Basic initalization for matplotlib figure."""
         clear_output()
         xticks = []
         try:
-            if level in self.colValueDictTrigger and level != self.column:
-                if level not in self.levelValues.keys():
-                    if self.dataindex == 'multi':
-                        self.levelValues[level] = self.dataframe.index.get_level_values(level).unique()
-                    elif self.dataindex == 'single':
-                        self.levelValues[level] = self.dataframe[level].unique()
-                for vol in set(self.levelValues[level]):
-                    xticks.append((vol))
+            xticks = self.results()[self.plotLevel.value].unique()
+            #if level in self.colValueDictTrigger and level != self.column:
+            #    if level not in self.levelValues.keys():
+            #        if self.dataindex == 'multi':
+            #            self.levelValues[level] = self.result.index.get_level_values(level).unique()
+            #        elif self.dataindex == 'single':
+            #            self.levelValues[level] = self.result[level].unique()
+            #    for vol in set(self.levelValues[level]):
+            #        xticks.append((vol))
         except ValueError:
             print('Can not use {0} for plotting'.format(level))
 
@@ -89,22 +92,39 @@ class CorpusVisualization(CorpusGUI):
 
     def _plotFunction(self, widget, content, buffers):
         resDict = {}
-        iterate = [x[0] for x in self.result.iterrows()]
-        resDict = OrderedDict(Counter((elem[0], elem[1]) for elem in iterate))
-        with plotout:
-            self._initFigure()
-            labelStr = ' '.join([ch.value for ch in accordion.children])
+        iterate = [x for x in self.results()[self.plotLevel.value]]
+        resDict = OrderedDict(Counter(elem for elem in iterate))
+        level = self.plotLevel.value
+        with self.plotout:
+            clear_output()
+            xticks = []
+            try:
+                if self.column != self.plotLevel.value:
+                    xticks = self.results()[self.plotLevel.value].unique()
+            except ValueError:
+                print('Can not use {0} for plotting'.format(level))
+
+            xtickslabels = sorted(xticks, key=lambda x: x[0])
+
+            fig = plt.figure(figsize=(8, 8))
+            ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+            ax.set_xticks(np.linspace(1,  len(xtickslabels) + 1, len(xtickslabels), endpoint=False))
+            ax.set_xticklabels(xtickslabels, rotation=45)
+            yMax = int(max(resDict.values()))
+            ax.set_yticks(np.arange(0, yMax+1,1))
+            #ax.set_yticklabels(['0', '', str(yMax/2), '', str(yMax)])
+            # self._initFigure()
+            labelStr = ' '.join([ch.value for ch in self.accordion.children])
             x = [x for x in range(1, len(resDict.keys())+1)]
-            maxRadius = max(list(resDict.values()))
-            radii = [xo for xo in [x/maxRadius for x in resDict.values()]]
-            plotDict[labelStr] = (resDict.values(), maxRadius)
-            i = 0
-            maxVal = sorted([v[1] for key, v in plotDict.items()])[-1]
-            colors = [cm.jet(i) for i in np.linspace(0, 1, len(plotDict.keys()))]
-            for key, value in plotDict.items():
-                radii = [xo for xo in [x/maxVal for x in value[0]]]
-                ax.bar(x, radii, width=0.3, alpha=0.3, color=colors[i], label=key)
-                i += 1
+            # maxRadius = max(list(resDict.values()))
+            y = [y for y in resDict.values()]
+            # self.plotDict[labelStr] = (resDict.values(), maxRadius)
+            # i = 0
+            # maxVal = sorted([v[1] for key, v in self.plotDict.items()])[-1]
+            # colors = [cm.jet(i) for i in np.linspace(0, 1, len(self.plotDict.keys()))]
+            # for key, value in self.plotDict.items():
+            # radii = [xo for xo in [x/maxVal for x in value[0]]]
+            ax.bar(x, y, width=0.3, alpha=0.3, label=labelStr)
 
             ax.legend()
 
