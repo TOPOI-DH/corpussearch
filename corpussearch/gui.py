@@ -89,9 +89,18 @@ class CorpusGUI(CorpusTextSearch):
 
         self.searchButton.on_msg(self._searchLogic)
 
-        self.direction = widgets.ToggleButtons(options=['previous', 'next'])
+        self.displayResult = pd.DataFrame()
 
-        self.direction.on_msg(self._setSentence)
+        self.direction = widgets.IntSlider(
+            value=0,
+            min=0,
+            max=self.displayResult.shape[0],
+            step=1,
+        )
+
+        self.direction.observe(self._setSentence, names='value')
+
+        self._chooseResult()
 
         self.outInfo = widgets.Output()
 
@@ -107,6 +116,18 @@ class CorpusGUI(CorpusTextSearch):
             value=''
         )
 
+    def _chooseResult(self):
+        # self.direction = widgets.ToggleButtons(options=['previous', 'next'])
+        self.direction = widgets.IntSlider(
+            value=0,
+            min=0,
+            max=self.displayResult.shape[0],
+            step=1,
+            )
+
+        # self.direction.on_msg(self._setSentence)
+        self.direction.observe(self._setSentence, names='value')
+
     def _setDescription(self):
         """ Helper function to display metadata for result"""
         res = 'Result {0}\n'.format(self.counter) + '\n'.join(
@@ -114,18 +135,28 @@ class CorpusGUI(CorpusTextSearch):
         )
         return res
 
-    def _setSentence(self, widget, content, buffers):
+    def _setSentence(self, value):
         """ Helper function: Navigate and set result to display"""
-        if widget.value == 'previous':
-            self.counter = self.counter - 1
-        elif widget.value == 'next':
-            self.counter = self.counter + 1
+        self.counter = value['new']
         if self.counter < self.displayResult.shape[0] and self.counter > -1:
             self.outSentence.value = self.displayResult[self.column].iloc[self.counter]
             self.outMeta.value = self._setDescription()
         else:
             self.outSentence.value = 'End of found results. Enter new search.'
         return
+
+    # def _setSentence(self, widget, content, buffers):
+    #     """ Helper function: Navigate and set result to display"""
+    #     if widget.value == 'previous':
+    #         self.counter = self.counter - 1
+    #     elif widget.value == 'next':
+    #         self.counter = self.counter + 1
+    #     if self.counter < self.displayResult.shape[0] and self.counter > -1:
+    #         self.outSentence.value = self.displayResult[self.column].iloc[self.counter]
+    #         self.outMeta.value = self._setDescription()
+    #     else:
+    #         self.outSentence.value = 'End of found results. Enter new search.'
+    #     return
 
     def _addSearchField(self, widget, content, buffers):
         """ Helper function to extend search logic."""
@@ -174,6 +205,8 @@ class CorpusGUI(CorpusTextSearch):
         if self.displayResult.shape[0] > 0:
             # TODO: Add plotting logic in handle_submit(sender)
             # handle_submit(sender)
+            maxVal = self.displayResult.copy()
+            self.direction.max = maxVal.shape[0]
 
             self.outSentence.value = re.sub(r'\n|\s+', ' ', self.displayResult[self.column].iloc[self.counter])
             self.outMeta.value = self._setDescription()
@@ -188,7 +221,7 @@ class CorpusGUI(CorpusTextSearch):
     def displayGUI(self):
         """Display the GUI for CorpusTextSearch"""
         searchControl = widgets.HBox([self.extendSearch, self.searchButton, self.outInfo])
-        textControl = widgets.HBox([self.direction])
+        textControl = self.direction
         sentenceFields = widgets.HBox([self.outMeta, self.outSentence])
         searchBox = widgets.VBox([self.accordion, searchControl, textControl, sentenceFields])
 
