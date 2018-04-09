@@ -75,7 +75,7 @@ class CorpusGUI(CorpusTextSearch):
             ):
 
         super(CorpusGUI, self).__init__(pathDF, dataType, dataIndex, colname, maxValues, pathMeta, pathType)
-        self.initSearch = SearchWordGUI(self.colValueDictTrigger, self.column)
+        self.initSearch = SearchWordGUI(self.searchFields, self.column)
         self.accordion = widgets.Accordion(children=[self.initSearch])
         self.accordion.set_title(0, 'Enter search term')
 
@@ -145,22 +145,9 @@ class CorpusGUI(CorpusTextSearch):
             self.outSentence.value = 'End of found results. Enter new search.'
         return
 
-    # def _setSentence(self, widget, content, buffers):
-    #     """ Helper function: Navigate and set result to display"""
-    #     if widget.value == 'previous':
-    #         self.counter = self.counter - 1
-    #     elif widget.value == 'next':
-    #         self.counter = self.counter + 1
-    #     if self.counter < self.displayResult.shape[0] and self.counter > -1:
-    #         self.outSentence.value = self.displayResult[self.column].iloc[self.counter]
-    #         self.outMeta.value = self._setDescription()
-    #     else:
-    #         self.outSentence.value = 'End of found results. Enter new search.'
-    #     return
-
     def _addSearchField(self, widget, content, buffers):
         """ Helper function to extend search logic."""
-        child = SearchWordGUI(self.colValueDictTrigger, self.column)
+        child = SearchWordGUI(self.searchFields, self.column)
         children = []
         for ch in self.accordion.children:
             children.append(ch)

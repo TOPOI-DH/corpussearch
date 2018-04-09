@@ -73,6 +73,12 @@ class CorpusTextSearch(object):
                     if len(self.dataframe.index.get_level_values(level).unique()) < maxValues:
                         self.colValueDictTrigger.append(level)
 
+        self.searchFields = []
+        if self.dataindex == 'single':
+            self.searchFields = self.dataframe.columns
+        elif self.dataindex == 'multi':
+            self.searchFields = self.dataframe.index.names
+
         self.extData = ''
         self.result = ''
 
@@ -241,7 +247,7 @@ class CorpusTextSearch(object):
             try:
                 return int(value)
             except ValueError:
-                raise('Can not cast {0} to type {1}'.format(value, levelType))
+                raise ValueError('Can not cast {0} to type {1}'.format(value, levelType))
         else:
             raise ValueError('Can not cast {0} to type {1}'.format(value, levelType))
 
