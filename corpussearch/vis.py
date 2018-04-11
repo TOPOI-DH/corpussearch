@@ -92,19 +92,27 @@ class CorpusVisualization(object):
 
     def _plotFunction(self, widget, content, buffers):
         resDict = {}
-        level = self.plotLevel.value
-        if level == 'Lambda Function':
-            self.resultDF['Lambda Function'] = self.resultDF.apply(lambda row: eval(self.addColumnField.value),axis=1)
+        if self.plotLevel.value == 'Lambda Function':
+            level = 'lambda_func'
+            try:
+                series = self.resultDF.apply(lambda row: eval(self.addColumnField.value),axis=1)
+                self.resultDF = self.resultDF.assign(lambda_func=series)
+            except:
+                print('failed assiging new column')
+        else:
+            level = self.plotLevel.value
         with self.plotout:
             if math.isclose(len(self.resultDF[level].unique())/self.resultDF.shape[0], 1, rel_tol=0.2):
+                clear_output()
                 print('Difference between number of unique values and dataframe dimension to small.')
             else:
                 clear_output()
-                iterate = [x for x in self.resultDF[self.plotLevel.value]]
+                iterate = [x for x in self.resultDF[level]]
                 resDict = OrderedDict(Counter(elem for elem in iterate))
                 xticks = []
                 try:
-                    xticks = self.resultDF[level].unique()
+                    xticks = self.resultDF[level].unique().tolist()
+                    xticks[:] = (elem[:15] for elem in xticks)
                 except:
                     print('Can not use {0} for plotting'.format(level))
                 xtickslabels = sorted(xticks)  # , key=lambda x: x[0])
@@ -113,7 +121,11 @@ class CorpusVisualization(object):
                 ax.set_xticks(np.linspace(1,  len(xtickslabels) + 1, len(xtickslabels), endpoint=False))
                 ax.set_xticklabels(xtickslabels, rotation=45)
                 yMax = int(max(resDict.values()))
-                ax.set_yticks(np.arange(0, yMax+1, 1))
+                if yMax > 10:
+                    interval = int(yMax/10)
+                else:
+                    interval = 1
+                ax.set_yticks(np.arange(0, yMax+1, interval))
                 x = [x for x in range(1, len(resDict.keys())+1)]
                 y = [y for y in resDict.values()]
                 ax.bar(x, y, width=0.3, alpha=0.3, label=self.label)

@@ -75,9 +75,9 @@ class CorpusTextSearch(object):
 
         self.searchFields = []
         if self.dataindex == 'single':
-            self.searchFields = self.dataframe.columns
+            self.searchFields = self.dataframe.columns.tolist()
         elif self.dataindex == 'multi':
-            self.searchFields = self.dataframe.index.names
+            self.searchFields = self.dataframe.index.names.tolist()
 
         self.extData = ''
         self.result = ''
@@ -185,7 +185,8 @@ class CorpusTextSearch(object):
                     if closestMatch:
                         searchValue = closestMatch[0]
                     else:
-                        raise ValueError(
+                        searchValue = value
+                        print(
                             'Could not find matching expression to search.'
                             )
                 except TypeError:
