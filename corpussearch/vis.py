@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import math
+import re
 from ast import literal_eval
 from collections import Counter, OrderedDict
 import matplotlib.pyplot as plt
@@ -45,7 +46,7 @@ class CorpusVisualization(object):
             self._resetPlotFunc
         )
         self.addColumnField = widgets.Text(
-            placeholder='callable function, e.g., row["number"] > 10'
+            placeholder='tuple of column and callable function, e.g., ("number", "row > 10")'
             )
         self.plotout = widgets.Output()
         self.plotLevelOut = widgets.Output()
@@ -95,23 +96,25 @@ class CorpusVisualization(object):
         if self.plotLevel.value == 'Lambda Function':
             level = 'lambda_func'
             try:
-                series = self.resultDF.apply(lambda row: eval(self.addColumnField.value),axis=1)
+                param = literal_eval(self.addColumnField.value)
+                series = self.resultDF[param[0]].apply(lambda row: eval(param[1]))
                 self.resultDF = self.resultDF.assign(lambda_func=series)
             except:
                 print('failed assiging new column')
+                self.resultDF = self.resultDF.assign(lambda_func=None)
         else:
             level = self.plotLevel.value
         with self.plotout:
-            if math.isclose(len(self.resultDF[level].unique())/self.resultDF.shape[0], 1, rel_tol=0.2):
+            if math.isclose(len(self.resultDF[level].apply(lambda row: str(row)).unique())/self.resultDF.shape[0], 1, rel_tol=0.2):
                 clear_output()
                 print('Difference between number of unique values and dataframe dimension to small.')
             else:
                 clear_output()
                 iterate = [x for x in self.resultDF[level]]
-                resDict = OrderedDict(Counter(elem for elem in iterate))
+                resDict = OrderedDict(Counter(str(elem) for elem in iterate))
                 xticks = []
                 try:
-                    xticks = self.resultDF[level].unique().tolist()
+                    xticks = self.resultDF[level].apply(lambda row: str(row)).unique().tolist()
                     xticks[:] = (elem[:15] for elem in xticks)
                 except:
                     print('Can not use {0} for plotting'.format(level))
