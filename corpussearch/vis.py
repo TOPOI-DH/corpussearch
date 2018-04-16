@@ -152,67 +152,89 @@ class VisualizeDistribution(object):
         self.column = column
         self.glossar = glossarDict
 
-        self.plotOut = widget.Output()
+        self.plotOut = widgets.Output()
 
-        self.generateCount()
+        self.plotGroupOut = widgets.Output()
 
-        self.choose = widget.Dropdown(
+        self._generateCount()
+
+        self.choose = widgets.Dropdown(
             description='Choose item:',
             options=self.glossarCount.keys()
         )
 
         self.choose.observe(
-            self.plotWordDistribution,
+            self._plotWordDistribution,
             names='value'
         )
 
         self.optList = list(self.glossar.keys())
         self.optList.insert(0, 'all')
 
-        self.select = widget.SelectMultiple(
+        self.select = widgets.SelectMultiple(
             options=self.optList,
             value=['all'],
             description='Select cat.',
             disabled=False
         )
 
-        self.groupSelect = widget.Dropdown(
-            options=self.dataframe.columns.values.tolist(),
+        self.groupOptlist = self.dataframe.columns.values.tolist()
+        self.groupOptlist.append('Lambda function')
+
+        self.addColumnField = widgets.Text(
+            placeholder='tuple of column and callable function, e.g., ("number", "row > 10")'
+            )
+
+        self.groupSelect = widgets.Dropdown(
+            options=self.groupOptlist,
             description='Group by'
         )
 
-        self.plot = widget.Button(
+        self.groupSelect.observe(
+            self._addFreeForm,
+
+        )
+
+        self.plot = widgets.Button(
             description='Plot'
             )
 
         self.plot.on_click(
-            self.plotGlossarDistribution
+            self._plotGlossarDistribution
         )
 
-    def natural_sort_key(self, s, _nsre=re.compile('([0-9]+)')):
+    def _addFreeForm(self, change):
+        """Display free form text field"""
+        if change['type'] == 'change' and change['name'] == 'value':
+            if change['new'] == 'Lambda Function':
+                with self.plotGroupOut:
+                    clear_output()
+                    display(self.addColumnField)
+
+    def _natural_sort_key(self, s, _nsre=re.compile('([0-9]+)')):
         return [int(text) if text.isdigit() else text.lower()
                 for text in re.split(_nsre, s)]
 
-    def queryWordOccurance(self, word, text):
+    def _queryWordOccurance(self, word, text):
         if word in text:
             return 1
         else:
             return 0
 
-    def generateCount(self):
+    def _generateCount(self):
         self.glossarCount = {}
         for key in self.glossar:
             res = []
             for word in self.glossar[key]:
                 num = self.dataframe[self.column].apply(
-                    lambda row: self.queryWordOccurance(word, row)
+                    lambda row: self._queryWordOccurance(word, row)
                     ).sum()
                 res.append((word, num))
             self.glossarCount[key] = res
 
-    def generateDistrCount(self, key, text, method='cumul'):
+    def _generateDistrCount(self, key, text, method='cumul'):
         count = 0
-        for word in glossar[key]:
+        for word in self.glossar[key]:
             if method == 'cumul':
                 res = re.findall(word, text)
                 if res:
@@ -222,33 +244,40 @@ class VisualizeDistribution(object):
                     count += 1
         return count
 
-    def preparePlotDF(self, groupColumn):
+    def _preparePlotDF(self, groupColumn):
         self.plotDF = self.dataframe.copy()
         for key in self.glossar.keys():
             self.plotDF[key] = self.dataframe[self.column].apply(
-                lambda row: self.generateDistrCount(key, row)
+                lambda row: self._generateDistrCount(key, row)
                 )
 
         sorted_index = sorted(list(self.plotDF.groupby(groupColumn).sum().index),
-                              key=lambda x: natural_sort_key(x)
+                              key=lambda x: self._natural_sort_key(x)
                               )
 
         self.sortedPlotDF = self.plotDF.groupby(groupColumn).sum().reindex(index=sorted_index).reset_index()
 
-    def plotWordDistribution(self, change):
+    def _plotWordDistribution(self, change):
         key = change['new']
         if not self.glossarCount:
-            self.generateCount()
+            self._generateCount()
         df = pd.DataFrame(self.glossarCount[key], columns=['word', 'count'])
         with self.plotOut:
             clear_output()
-            df.plot.bar(x='word', y='count', figsize=(8, 5), title=key, legend=True, rot=45)
+            ax = df.plot.bar(
+                x='word',
+                y='count',
+                figsize=(8, 5),
+                title=key,
+                legend=True,
+                rot=45)
+            ax.set_xlabel('Word', fontsize=12)
+            ax.set_ylabel("Count", fontsize=12)
+            ax.legend(loc='upper right')
+            plt.show()
 
-    def plotGlossarDistribution(self, change):
-        try:
-            self.sortedPlotDF
-        except:
-            self.preparePlotDF(self.groupSelect.value)
+    def _plotGlossarDistribution(self, change):
+        self._preparePlotDF(self.groupSelect.value)
         if 'all' in list(self.select.value):
             dfPlot = self.sortedPlotDF
         else:
@@ -276,4 +305,6 @@ class VisualizeDistribution(object):
         display(self.choose, self.plotOut)
 
     def displayDistGUI(self):
-        display(widget.HBox([self.select, self.groupSelect, self.plot]), self.plotOut)
+        display(widgets.HBox([self.select, self.plotGroupOut, self.plot]), self.plotOut)
+        with self.plotGroupOut:
+            display(self.groupSelect)
