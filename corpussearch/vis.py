@@ -142,3 +142,138 @@ class CorpusVisualization(object):
         display(searchBox)
         with self.plotLevelOut:
             display(self.plotLevel)
+
+
+class VisualizeDistribution(object):
+
+    def __init__(self, dataframe, column, glossarDict):
+
+        self.dataframe = dataframe
+        self.column = column
+        self.glossar = glossarDict
+
+        self.plotOut = widget.Output()
+
+        self.generateCount()
+
+        self.choose = widget.Dropdown(
+            description='Choose item:',
+            options=self.glossarCount.keys()
+        )
+
+        self.choose.observe(
+            self.plotWordDistribution,
+            names='value'
+        )
+
+        self.optList = list(self.glossar.keys())
+        self.optList.insert(0, 'all')
+
+        self.select = widget.SelectMultiple(
+            options=self.optList,
+            value=['all'],
+            description='Select cat.',
+            disabled=False
+        )
+
+        self.groupSelect = widget.Dropdown(
+            options=self.dataframe.columns.values.tolist(),
+            description='Group by'
+        )
+
+        self.plot = widget.Button(
+            description='Plot'
+            )
+
+        self.plot.on_click(
+            self.plotGlossarDistribution
+        )
+
+    def natural_sort_key(self, s, _nsre=re.compile('([0-9]+)')):
+        return [int(text) if text.isdigit() else text.lower()
+                for text in re.split(_nsre, s)]
+
+    def queryWordOccurance(self, word, text):
+        if word in text:
+            return 1
+        else:
+            return 0
+
+    def generateCount(self):
+        self.glossarCount = {}
+        for key in self.glossar:
+            res = []
+            for word in self.glossar[key]:
+                num = self.dataframe[self.column].apply(
+                    lambda row: self.queryWordOccurance(word, row)
+                    ).sum()
+                res.append((word, num))
+            self.glossarCount[key] = res
+
+    def generateDistrCount(self, key, text, method='cumul'):
+        count = 0
+        for word in glossar[key]:
+            if method == 'cumul':
+                res = re.findall(word, text)
+                if res:
+                    count += len(res)
+            elif method == 'single':
+                if word in text:
+                    count += 1
+        return count
+
+    def preparePlotDF(self, groupColumn):
+        self.plotDF = self.dataframe.copy()
+        for key in self.glossar.keys():
+            self.plotDF[key] = self.dataframe[self.column].apply(
+                lambda row: self.generateDistrCount(key, row)
+                )
+
+        sorted_index = sorted(list(self.plotDF.groupby(groupColumn).sum().index),
+                              key=lambda x: natural_sort_key(x)
+                              )
+
+        self.sortedPlotDF = self.plotDF.groupby(groupColumn).sum().reindex(index=sorted_index).reset_index()
+
+    def plotWordDistribution(self, change):
+        key = change['new']
+        if not self.glossarCount:
+            self.generateCount()
+        df = pd.DataFrame(self.glossarCount[key], columns=['word', 'count'])
+        with self.plotOut:
+            clear_output()
+            df.plot.bar(x='word', y='count', figsize=(8, 5), title=key, legend=True, rot=45)
+
+    def plotGlossarDistribution(self, change):
+        try:
+            self.sortedPlotDF
+        except:
+            self.preparePlotDF(self.groupSelect.value)
+        if 'all' in list(self.select.value):
+            dfPlot = self.sortedPlotDF
+        else:
+            cols = list(self.select.value)
+            cols.append(self.groupSelect.value)
+            dfPlot = self.sortedPlotDF[cols]
+
+        with self.plotOut:
+            clear_output()
+            ax = dfPlot.plot(
+                kind='area',
+                x=str(self.groupSelect.value),
+                colormap='jet',
+                use_index=False,
+                figsize=(10, 5),
+                legend=True,
+                fontsize=10,
+                stacked=True)
+            ax.set_xlabel(str(self.groupSelect.value), fontsize=12)
+            ax.set_ylabel("Count", fontsize=12)
+            ax.legend(loc='upper right')
+            plt.show()
+
+    def displayWordGUI(self):
+        display(self.choose, self.plotOut)
+
+    def displayDistGUI(self):
+        display(widget.HBox([self.select, self.groupSelect, self.plot]), self.plotOut)
