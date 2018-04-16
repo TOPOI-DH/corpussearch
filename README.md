@@ -13,7 +13,7 @@ This package is designed to work with Jupyter Notebooks as well as in the IPytho
 2. [Usage](#basic-usage)
 3. [GUI usage](#gui-usage)
 4. [Search in context](#search-words-of-similar-context)
-5. [Visualization](#visual)
+5. [Visualization](#visualization)
 
 
 # Installation
@@ -163,7 +163,7 @@ If the search term is not contained in the dictionary, `difflib` tries to find a
 
 # Visualization
 
-** Attention: ** *work in progress*
+**Attention:** *work in progress*
 
 To visualize results of a search in Jupyter Notebooks you can use the `visualize` module.
 ```python
