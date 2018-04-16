@@ -185,3 +185,4 @@ Additionally, the user can select the option `lambda function` to enter a custom
 ```python
 vis.resultDF.lambda_func
 ```
+If the lambda function fails to create a new column, a warning is printed and a new column with `None` values is returned.
