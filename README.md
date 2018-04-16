@@ -167,7 +167,7 @@ If the search term is not contained in the dictionary, `difflib` tries to find a
 
 To visualize results of a search in Jupyter Notebooks you can use the `visualize` module.
 ```python
-from corpussearch import visualize as corVis
+from corpussearch import vis as corVis
 ```
 It is initialized with any result dataframe of a search and a label, which describes the search in the corpus.
 ```python
