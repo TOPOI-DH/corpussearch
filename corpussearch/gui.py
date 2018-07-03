@@ -2,9 +2,7 @@
 import pandas as pd
 import re
 import ipywidgets as widgets
-from IPython.display import clear_output
-from IPython import display
-
+from IPython.display import clear_output, display
 
 from citableclass.base import Citable
 from .base import CorpusTextSearch
