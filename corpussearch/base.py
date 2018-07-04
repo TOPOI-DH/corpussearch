@@ -77,7 +77,7 @@ class CorpusTextSearch(object):
         if self.dataindex == 'single':
             self.searchFields = self.dataframe.columns.tolist()
         elif self.dataindex == 'multi':
-            self.searchFields = self.dataframe.index.names.tolist()
+            self.searchFields = list(self.dataframe.index.names)
 
         self.extData = ''
         self.result = ''
