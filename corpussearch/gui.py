@@ -2,12 +2,10 @@
 import pandas as pd
 import re
 import ipywidgets as widgets
-from IPython.display import clear_output
-
+from IPython.display import clear_output, display
 
 from citableclass.base import Citable
 from .base import CorpusTextSearch
-# from corpussearch.base import CorpusTextSearch
 
 
 class SearchWordGUI(widgets.HBox):
