@@ -52,6 +52,8 @@ class CorpusTextSearch(object):
                 self.dataframe = pd.read_csv(pathDF, error_bad_lines=False)
             elif self.datatype == 'json':
                 self.dataframe = pd.read_json(pathDF)
+            elif self.datatype == 'orientedJson':
+                self.dataframe = pd.read_json(pathDF, orient='table')
             else:
                 raise ValueError(
                     'Please provide data in pickle,excel,csv or json format'
