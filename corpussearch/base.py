@@ -38,12 +38,12 @@ class CorpusTextSearch(object):
             pathDF = "http://dx.doi.org/{0}".format(pathDF)
         elif pathType == 'citable':
             self.citable = Citable(pathDF)
-            self.dataframe = self.citable.df()
+            self.dataframe = self.citable.digitalresource()
         elif pathType == 'citable-dev':
             self.citable = Citable(pathDF, formats='dev')
-            self.dataframe = self.citable.df(dtype='oriented')
+            self.dataframe = self.citable.digitalresource()
 
-        if not pathType == 'citable':
+        if not pathType in ['citable', 'citable-dev']:
             if self.datatype == 'pickle':
                 self.dataframe = pd.read_pickle(pathDF)
             elif self.datatype == 'excel':
