@@ -38,7 +38,10 @@ class CorpusTextSearch(object):
             pathDF = "http://dx.doi.org/{0}".format(pathDF)
         elif pathType == 'citable':
             self.citable = Citable(pathDF)
-            self.dataframe = self.citable.digitalresource()
+            self.dataframe = self.citable.df()
+        elif pathType == 'citable-dev':
+            self.citable = Citable(pathDF, formats='dev')
+            self.dataframe = self.citable.df(dtype='oriented')
 
         if not pathType == 'citable':
             if self.datatype == 'pickle':
