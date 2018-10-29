@@ -102,6 +102,14 @@ class CorpusGUI(CorpusTextSearch):
 
         self.outInfo = widgets.Output()
 
+        self.dfOut = widgets.Output()
+
+        self.checkDataframe = widgets.Checkbox(
+            value=False,
+            description='Return Dataframe',
+            disabled=False
+        )
+
         self.outSentence = widgets.Textarea(
             value='',
             layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='70%'),
@@ -113,6 +121,8 @@ class CorpusGUI(CorpusTextSearch):
             layout=widgets.Layout(flex='0 1 auto', height='200px', min_height='40px', width='30%'),
             value=''
         )
+
+        self.sentenceFields = widgets.HBox([self.outMeta, self.outSentence])
 
     def _chooseResult(self):
         # self.direction = widgets.ToggleButtons(options=['previous', 'next'])
@@ -137,7 +147,7 @@ class CorpusGUI(CorpusTextSearch):
         """ Helper function: Navigate and set result to display"""
         self.counter = value['new']
         if self.counter < self.displayResult.shape[0] and self.counter > -1:
-            self.outSentence.value = self.displayResult[self.column].iloc[self.counter]
+            self.outSentence.value = str(self.displayResult[self.column].iloc[self.counter])
             self.outMeta.value = self._setDescription()
         else:
             self.outSentence.value = 'End of found results. Enter new search.'
@@ -193,7 +203,7 @@ class CorpusGUI(CorpusTextSearch):
             maxVal = self.displayResult.copy()
             self.direction.max = maxVal.shape[0]
 
-            self.outSentence.value = re.sub(r'\n|\s+', ' ', self.displayResult[self.column].iloc[self.counter])
+            self.outSentence.value = re.sub(r'\n|\s+', ' ', str(self.displayResult[self.column].iloc[self.counter]))
             self.outMeta.value = self._setDescription()
             with self.outInfo:
                 clear_output()
@@ -202,12 +212,17 @@ class CorpusGUI(CorpusTextSearch):
             with self.outInfo:
                 clear_output()
                 print('Found no entries. Try changing search!')
+        with self.dfOut:
+            clear_output()
+            if self.checkDataframe.value is True:
+                print('Resulting dataframe is accesible by using ".result".')
+                display(self.result)
+            else:
+                display(self.sentenceFields)
 
     def displayGUI(self):
         """Display the GUI for CorpusTextSearch"""
-        searchControl = widgets.HBox([self.extendSearch, self.searchButton, self.outInfo])
+        searchControl = widgets.HBox([self.extendSearch, self.searchButton, self.outInfo, self.checkDataframe])
         textControl = self.direction
-        sentenceFields = widgets.HBox([self.outMeta, self.outSentence])
-        searchBox = widgets.VBox([self.accordion, searchControl, textControl, sentenceFields])
-
+        searchBox = widgets.VBox([self.accordion, searchControl, textControl, self.dfOut])
         return display(searchBox)

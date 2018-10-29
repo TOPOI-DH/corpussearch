@@ -42,8 +42,13 @@ class CorpusTextSearch(object):
         elif pathType == 'citable-dev':
             self.citable = Citable(pathDF, formats='dev')
             self.dataframe = self.citable.digitalresource()
+        elif pathType == 'citable-local':
+            self.citable = Citable(pathDF, formats='local')
+            self.dataframe = self.citable.digitalresource()
+        elif pathType == 'variable':
+            self.dataframe = pathDF
 
-        if not pathType in ['citable', 'citable-dev']:
+        if pathType not in ['variable', 'citable', 'citable-dev', 'citable-local']:
             if self.datatype == 'pickle':
                 self.dataframe = pd.read_pickle(pathDF)
             elif self.datatype == 'excel':
@@ -77,12 +82,22 @@ class CorpusTextSearch(object):
                 if not self.dataframe.index.get_level_values(level).dtype.name in ['int', 'int64', 'float64']:
                     if len(self.dataframe.index.get_level_values(level).unique()) < maxValues:
                         self.colValueDictTrigger.append(level)
+            for col in self.dataframe.columns:
+                if not self.dataframe[col].dtype.name in ['int', 'int64', 'float64']:
+                    try:
+                        length = len(self.dataframe[col].unique())
+                        if length < maxValues:
+                            self.colValueDictTrigger.append(col)
+                    except TypeError:
+                        print('Encountered list value in cell, skipping...')
+                        pass
 
         self.searchFields = []
         if self.dataindex == 'single':
             self.searchFields = self.dataframe.columns.tolist()
         elif self.dataindex == 'multi':
             self.searchFields = list(self.dataframe.index.names)
+            self.searchFields.extend(self.dataframe.columns.tolist())
 
         self.extData = ''
         self.result = ''
@@ -158,7 +173,10 @@ class CorpusTextSearch(object):
         """ Returns boolean list for dataframe[part]==value."""
         searchvalue = self._fuzzySearch(level, value)
         if self.dataindex == 'multi' and level != self.column:
-            res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
+            try:
+                res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
+            except:
+                res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
         elif self.dataindex == 'single' and level != self.column:
             res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
         elif level == self.column:
@@ -174,9 +192,12 @@ class CorpusTextSearch(object):
         if level in self.colValueDictTrigger and level != self.column:
             if level not in self.levelValues.keys():
                 if self.dataindex == 'multi':
-                    self.levelValues[level] = self.dataframe.index.get_level_values(level).unique()
+                    try:
+                        self.levelValues[level] = [str(x) for x in self.dataframe.index.get_level_values(level).unique()]
+                    except:
+                        self.levelValues[level] = [str(x) for x in self.dataframe[level].unique()]
                 elif self.dataindex == 'single':
-                    self.levelValues[level] = self.dataframe[level].unique()
+                    self.levelValues[level] = [str(x) for x in self.dataframe[level].unique()]
                 else:
                     raise ValueError(
                         'DataIndex not "single" or "multi".'
@@ -221,9 +242,15 @@ class CorpusTextSearch(object):
         """Helper function for reducing dataframes"""
         if self.dataindex == 'multi':
             if type(self.result) == str:
-                self.result = self.dataframe.xs(self._assertDataType(level, value, self.dataframe), level=level, drop_level=False)
+                try:
+                    self.result = self.dataframe.xs(self._assertDataType(level, value, self.dataframe), level=level, drop_level=False)
+                except:
+                    self.result = self.dataframe[self.dataframe[level] == self._assertDataType(level, value, self.dataframe)]
             else:
-                self.result = self.result.xs(self._assertDataType(level, value, self.result), level=level, drop_level=False)
+                try:
+                    self.result = self.result.xs(self._assertDataType(level, value, self.result), level=level, drop_level=False)
+                except:
+                    self.result = self.result[self.result[level] == self._assertDataType(level, value, self.result)]
         elif self.dataindex == 'single':
             if type(self.result) == str:
                 self.result = self.dataframe[self.dataframe[level] == self._assertDataType(level, value, self.dataframe)]
@@ -235,7 +262,10 @@ class CorpusTextSearch(object):
         numTypes = ['int8', 'int16', 'int32', 'int64', 'float', 'float64']
         valueType = type(value)
         if self.dataindex == 'multi' and level != self.column:
-            levelType = dataframe.index.get_level_values(level=level).dtype.name
+            try:
+                levelType = self.dataframe.index.get_level_values(level=level).dtype.name
+            except:
+                levelType = self.dataframe[level].dtype.name
         elif self.dataindex == 'single' or level == self.column:
             levelType = self.dataframe[level].dtype.name
         if levelType == 'object' and valueType == str:
@@ -286,7 +316,7 @@ class CorpusTextSearch(object):
 
     def _countWords(self, level, value):
         """Helper function to count words on a given level."""
-        text = ' '.join(self.dataframe.xs(value, level=level).text.tolist())
+        text = ' '.join([str(x) for x in self.dataframe.xs(value, level=level).text.tolist()])
         numWords = len(re.findall(r'\w+', text))
         return numWords
 
