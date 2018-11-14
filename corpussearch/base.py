@@ -192,10 +192,14 @@ class CorpusTextSearch(object):
                             else:
                                 raise ValueError('Cannot understand boundaries. Aborting..')
                         else:
-                            if logicSymbol in ['<', '<=']:
+                            if logicSymbol == '<':
                                 res = self.dataframe[level].astype(float).lt(int(parts[-1]))
-                            elif logicSymbol in ['>', '>=']:
+                            elif logicSymbol == '<=':
+                                res = self.dataframe[level].astype(float).le(int(parts[-1]))
+                            elif logicSymbol == '>':
                                 res = self.dataframe[level].astype(float).gt(int(parts[-1]))
+                            elif logicSymbol == '>=':
+                                res = self.dataframe[level].astype(float).ge(int(parts[-1]))
                             else:
                                 raise ValueError('Cannot understand boundaries. Aborting..')
                         return res
