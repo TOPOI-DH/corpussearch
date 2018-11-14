@@ -180,7 +180,7 @@ class CorpusTextSearch(object):
             pass
         if type(value) != list:
             if any([x in value for x in ['<', '>', '<=', '>=']]):
-                for x in ['<', '>', '<=', '>=']:
+                for x in ['<=', '>=', '<', '>']:
                     if x in value:
                         logicSymbol = x
                         parts = [x.strip() for x in value.split(logicSymbol)]
