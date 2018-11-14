@@ -237,6 +237,7 @@ class CorpusTextSearch(object):
         try:
             values = literal_eval(value)
             assert type(values) == list
+            value = values
         except:
             pass
         if type(value) == list:
@@ -250,7 +251,7 @@ class CorpusTextSearch(object):
     def _searchValues(self, level, values):
         """Helper function to slice dataframe with a list of values"""
         if self.dataindex == 'multi':
-            if type(self.results) == str:
+            if type(self.result) == str:
                 mask = self.dataframe.index.get_level_values(level).isin(values)
                 self.result = self.dataframe[mask]
             else:
