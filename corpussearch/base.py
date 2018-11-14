@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import re
 import difflib
+from ast import literal_eval
 from citableclass.base import Citable
 
 
@@ -233,6 +234,11 @@ class CorpusTextSearch(object):
             Result is in self.result, to be able to chain reductions.
             To view result use self.results()
         """
+        try:
+            values = literal_eval(value)
+            assert type(values) == list
+        except:
+            pass
         if type(value) == list:
             searchValues = [self._fuzzySearch(level, val) for val in value]
             self._searchValues(level, searchValues)
