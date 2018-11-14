@@ -172,17 +172,36 @@ class CorpusTextSearch(object):
 
     def boolList(self, level, value):
         """ Returns boolean list for dataframe[part]==value."""
-        searchvalue = self._fuzzySearch(level, value)
-        if self.dataindex == 'multi' and level != self.column:
-            try:
-                res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
-            except:
+        try:
+            values = literal_eval(value)
+            assert type(values) == list
+            value = values
+        except:
+            pass
+        if type(value) != list:
+            searchvalue = self._fuzzySearch(level, value)
+            if self.dataindex == 'multi' and level != self.column:
+                try:
+                    res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
+                except:
+                    res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
+            elif self.dataindex == 'single' and level != self.column:
                 res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
-        elif self.dataindex == 'single' and level != self.column:
-            res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
-        elif level == self.column:
-            res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
-        return res
+            elif level == self.column:
+                res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
+            return res
+        else:
+            if self.dataindex == 'multi':
+                if type(self.result) == str:
+                    mask = self.dataframe.index.get_level_values(level).isin(values)
+                else:
+                    mask = self.result.index.get_level_values(level).isin(values)
+            else:
+                if type(self.result) == str:
+                    mask = self.dataframe[level].isin(values)
+                else:
+                    mask = self.result[level].isin(values)
+            return mask
 
     def _fuzzySearch(self, level, value):
         """
