@@ -186,16 +186,16 @@ class CorpusTextSearch(object):
                         parts = [x.strip() for x in value.split(logicSymbol)]
                         if len(parts) == 3:
                             if logicSymbol == '<':
-                                res = self.dataframe[level].between(int(parts[0]), int(parts[-1]), inclusive=False)
+                                res = self.dataframe[level].astype(float).between(int(parts[0]), int(parts[-1]), inclusive=False)
                             elif logicSymbol == '<=':
-                                res = self.dataframe[level].between(int(parts[0]), int(parts[-1]))
+                                res = self.dataframe[level].astype(float).between(int(parts[0]), int(parts[-1]))
                             else:
                                 raise ValueError('Cannot understand boundaries. Aborting..')
                         else:
                             if logicSymbol in ['<', '<=']:
-                                res = self.dataframe[level].lt(int(parts[-1]))
+                                res = self.dataframe[level].astype(float).lt(int(parts[-1]))
                             elif logicSymbol in ['>', '>=']:
-                                res = self.dataframe[level].gt(int(parts[-1]))
+                                res = self.dataframe[level].astype(float).gt(int(parts[-1]))
                             else:
                                 raise ValueError('Cannot understand boundaries. Aborting..')
             else:
