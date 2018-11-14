@@ -179,28 +179,42 @@ class CorpusTextSearch(object):
         except:
             pass
         if type(value) != list:
-            searchvalue = self._fuzzySearch(level, value)
-            if self.dataindex == 'multi' and level != self.column:
-                try:
-                    res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
-                except:
+            if any([x in value for x in ['<', '>', '<=', '>=']]):
+                for x in ['<', '>', '<=', '>=']:
+                    if x in value:
+                        logicSymbol = x
+                        parts = [x.strip() for x in value.split(logicSymbol)]
+                        if len(parts) == 3:
+                            if logicSymbol == '<':
+                                res = self.dataframe[level].between(int(parts[0]), int(parts[-1]), inclusive=False)
+                            elif logicSymbol == '<=':
+                                res = self.dataframe[level].between(int(parts[0]), int(parts[-1]))
+                            else:
+                                raise ValueError('Cannot understand boundaries. Aborting..')
+                        else:
+                            if logicSymbol in ['<', '<=']:
+                                res = self.dataframe[level].lt(int(parts[-1]))
+                            elif logicSymbol in ['>', '>=']:
+                                res = self.dataframe[level].gt(int(parts[-1]))
+                            else:
+                                raise ValueError('Cannot understand boundaries. Aborting..')
+            else:
+                searchvalue = self._fuzzySearch(level, value)
+                if self.dataindex == 'multi' and level != self.column:
+                    try:
+                        res = self.dataframe.index.get_level_values(level) == self._assertDataType(level, searchvalue, self.dataframe)
+                    except:
+                        res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
+                elif self.dataindex == 'single' and level != self.column:
                     res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
-            elif self.dataindex == 'single' and level != self.column:
-                res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
-            elif level == self.column:
-                res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
+                elif level == self.column:
+                    res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
             return res
         else:
             if self.dataindex == 'multi':
-                if type(self.result) == str:
-                    mask = self.dataframe.index.get_level_values(level).isin(values)
-                else:
-                    mask = self.result.index.get_level_values(level).isin(values)
+                mask = self.dataframe.index.get_level_values(level).isin(values)
             else:
-                if type(self.result) == str:
-                    mask = self.dataframe[level].isin(values)
-                else:
-                    mask = self.result[level].isin(values)
+                mask = self.dataframe[level].isin(values)
             return mask
 
     def _fuzzySearch(self, level, value):
