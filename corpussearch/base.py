@@ -233,10 +233,28 @@ class CorpusTextSearch(object):
             Result is in self.result, to be able to chain reductions.
             To view result use self.results()
         """
-
-        searchValue = self._fuzzySearch(level, value)
-        self._searchString(level, searchValue)
+        if type(value) == list:
+            searchValues = [self._fuzzySearch(level, val) for val in value]
+            self._searchValues(level, searchValues)
+        else:
+            searchValue = self._fuzzySearch(level, value)
+            self._searchString(level, searchValue)
         return self
+
+    def _searchValues(self, level, values):
+        """Helper function to slice dataframe with a list of values"""
+        if self.dataindex == 'multi':
+            if type(self.results) == str:
+                mask = self.dataframe.index.get_level_values(level).isin(values)
+                self.result = self.dataframe[mask]
+            else:
+                mask = self.result.index.get_level_values(level).isin(values)
+                self.result = self.result[mask]
+        else:
+            if type(self.results) == str:
+                self.result = self.dataframe[self.dataframe[level].isin(values)]
+            else:
+                self.result = self.result[self.result[level].isin(values)]
 
     def _searchString(self, level, value):
         """Helper function for reducing dataframes"""
