@@ -198,6 +198,7 @@ class CorpusTextSearch(object):
                                 res = self.dataframe[level].astype(float).gt(int(parts[-1]))
                             else:
                                 raise ValueError('Cannot understand boundaries. Aborting..')
+                        return res
             else:
                 searchvalue = self._fuzzySearch(level, value)
                 if self.dataindex == 'multi' and level != self.column:
