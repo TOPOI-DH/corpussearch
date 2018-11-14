@@ -258,7 +258,7 @@ class CorpusTextSearch(object):
                 mask = self.result.index.get_level_values(level).isin(values)
                 self.result = self.result[mask]
         else:
-            if type(self.results) == str:
+            if type(self.result) == str:
                 self.result = self.dataframe[self.dataframe[level].isin(values)]
             else:
                 self.result = self.result[self.result[level].isin(values)]
