@@ -229,7 +229,7 @@ class CorpusTextSearch(object):
 
     def _rowListFilter(self, inRow, value):
         ret = _yieldListElem(inRow)
-            return any([value in x for x in ret])
+        return any([value in x for x in ret])
 
     def _yieldListElem(self,inList):
         for y in inList:
