@@ -214,7 +214,7 @@ class CorpusTextSearch(object):
                     res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
                     if not any(res):
                         try:
-                            res = self.dataframe[self.dataframe[level].apply(lambda row: _rowListFilter(row,value))]
+                            res = self.dataframe[self.dataframe[level].apply(lambda row: self._rowListFilter(row,value))]
                         except:
                             pass
                 elif level == self.column:
@@ -228,7 +228,7 @@ class CorpusTextSearch(object):
             return mask
 
     def _rowListFilter(self, inRow, value):
-        ret = _yieldListElem(inRow)
+        ret = self._yieldListElem(inRow)
         return any([value in x for x in ret])
 
     def _yieldListElem(self,inList):
