@@ -86,7 +86,7 @@ class CorpusTextSearch(object):
             for col in self.dataframe.columns:
                 if not self.dataframe[col].dtype.name in ['int', 'int64', 'float64']:
                     try:
-                        length = len(self.dataframe[col].unique())
+                        length = len(self.dataframe[col].unique())row
                         if length < maxValues:
                             self.colValueDictTrigger.append(col)
                     except TypeError:
@@ -214,7 +214,7 @@ class CorpusTextSearch(object):
                     res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
                     if not any(res):
                         try:
-                            res = self.dataframe[self.dataframe[level].apply(lambda row: _rowListFilter(row,value)))]
+                            res = self.dataframe[self.dataframe[level].apply(lambda row: _rowListFilter(row,value))]
                         except:
                             pass
                 elif level == self.column:
