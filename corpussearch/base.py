@@ -76,7 +76,7 @@ class CorpusTextSearch(object):
                         if length < maxValues:
                             self.colValueDictTrigger.append(col)
                     except TypeError:
-                        print('Encountered list value in cell, skipping...')
+                        # print('Encountered list value in cell, skipping...')
                         pass
         elif self.dataindex == 'multi':
             for level in self.dataframe.index.names:
@@ -212,6 +212,11 @@ class CorpusTextSearch(object):
                         res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
                 elif self.dataindex == 'single' and level != self.column:
                     res = self.dataframe[level] == self._assertDataType(level, searchvalue, self.dataframe)
+                    if not any(res):
+                        try:
+                            res = self.dataframe[self.dataframe[level].apply(lambda row: _rowListFilter(row,value)))]
+                        except:
+                            pass
                 elif level == self.column:
                     res = self.dataframe[level].str.contains(self._assertDataType(level, value, self.dataframe)) == True
             return res
@@ -222,11 +227,22 @@ class CorpusTextSearch(object):
                 mask = self.dataframe[level].isin(values)
             return mask
 
+    def _rowListFilter(self, inRow, value):
+        ret = _yieldListElem(inRow)
+            return any([value in x for x in ret])
+
+    def _yieldListElem(self,inList):
+        for y in inList:
+            if isinstance(y, list):
+                yield from self._yieldListElem(y)
+            else:
+                yield y
+
     def _fuzzySearch(self, level, value):
         """
         Allow fuzzy search for reduce() and search() routines. Limited to
         columns in the colValueDictTrigger list. This excludes columns containing
-        numerical data, as well as the main column 'colname'.
+        numerical or list data, as well as the main column 'colname'.
         """
         if level in self.colValueDictTrigger and level != self.column:
             if level not in self.levelValues.keys():
