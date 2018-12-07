@@ -12,7 +12,7 @@ setup(
     name="corpussearch",
 
     # Version number (initial):
-    version="0.0.15",
+    version="0.0.16",
 
     # Application author details:
     author="Malte Vogl",
@@ -45,7 +45,7 @@ setup(
     project_urls={
         'Home': 'https://github.com/computational-antiquity/corpussearch/',
         'Tracker': 'https://github.com/computational-antiquity/corpussearch/issues',
-        'Download': 'https://github.com/computational-antiquity/corpussearch/archive/0.0.15.tar.gz',
+        'Download': 'https://github.com/computational-antiquity/corpussearch/archive/0.0.16.tar.gz',
     },
 
     python_requires='>=3',
