@@ -90,7 +90,7 @@ class CorpusTextSearch(object):
                         if length < maxValues:
                             self.colValueDictTrigger.append(col)
                     except TypeError:
-                        print('Encountered list value in cell, skipping...')
+                        #print('Encountered list value in cell, skipping...')
                         pass
 
         self.searchFields = []
